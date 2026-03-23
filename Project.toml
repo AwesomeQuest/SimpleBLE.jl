@@ -1,0 +1,10 @@
+name = "SimpleBLE"
+uuid = "c43e3543-e659-46d0-a341-79c7b8740d4a"
+version = "0.1.0"
+authors = ["Awesome Quest <torfit@gmail.com>"]
+
+[deps]
+JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+
+[compat]
+JSON = "1.4.0"
