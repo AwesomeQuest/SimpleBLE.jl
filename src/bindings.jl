@@ -26,11 +26,15 @@ export adapter_get_count,
 	peripheral_write_descriptor,
 	peripheral_read,
 	peripheral_read_descriptor,
+	peripheral_notify,
+	peripheral_indicate,
 	simpleble_free,
 	adapter_release_handle,
 	adapter_identifier
 
 const simpleblepath = joinpath(@__DIR__, "..", "shared", "bin", "simplecble.dll")
+
+const _active_callbacks = Dict{Ptr{Cvoid}, Base.CFunction}()
 
 const SIMPLEBLE_UUID_STR_LEN =37  # 36 characters + null terminator
 const SIMPLEBLE_CHARACTERISTIC_MAX_COUNT =16
@@ -122,8 +126,8 @@ end;
 function adapter_address(handle::SBLEAdapter)
 	sblestring = _adapter_address(handle)
 	GC.@preserve sblestring begin
-	output = unsafe_string(sblestring)
-		simpleble_free(sblestring)
+		output = unsafe_string(sblestring)
+		# simpleble_free(sblestring)
 	end
 	return output
 end
@@ -158,8 +162,8 @@ adapter_get_paired_peripherals_handle(handle::SBLEAdapter, index) =
 function adapter_identifier(handle::SBLEAdapter)
 	sblestring = _adapter_identifier(handle)
 	GC.@preserve sblestring begin
-	output = unsafe_string(sblestring)
-		simpleble_free(sblestring)
+		output = unsafe_string(sblestring)
+		# simpleble_free(sblestring)
 	end
 	return output
 end
@@ -213,6 +217,7 @@ adapter_scan_stop(handle::SBLEAdapter) =
 
 function adapter_set_callback_on_power_off(handle, callback, userdata)
 	c_callback = @cfunction($callback, Cvoid, (SBLEAdapter, Ptr{Cvoid}))
+	_active_callbacks[handle] = c_callback  # prevent GC
 	_adapter_set_callback_on_power_off(handle, c_callback, userdata)
 end
 _adapter_set_callback_on_power_off(handle::SBLEAdapter, callback, userdata) =
@@ -222,6 +227,7 @@ _adapter_set_callback_on_power_off(handle::SBLEAdapter, callback, userdata) =
 
 function adapter_set_callback_on_power_on(handle::SBLEAdapter, callback, userdata)
 	c_callback = @cfunction($callback, Cvoid, (SBLEAdapter, Ptr{Cvoid}))
+	_active_callbacks[handle] = c_callback  # prevent GC
 	_adapter_set_callback_on_power_on(handle, c_callback, userdata)
 end
 _adapter_set_callback_on_power_on(handle::SBLEAdapter, callback, userdata) =
@@ -231,6 +237,7 @@ _adapter_set_callback_on_power_on(handle::SBLEAdapter, callback, userdata) =
 
 function adapter_set_callback_on_scan_found(handle::SBLEAdapter, callback, userdata)
 	c_callback = @cfunction($callback, Cvoid, (SBLEAdapter, SBLEPeripheral, Ptr{Cvoid}))
+	_active_callbacks[handle] = c_callback  # prevent GC
 	_adapter_set_callback_on_scan_found(handle, c_callback, userdata)
 end
 _adapter_set_callback_on_scan_found(handle::SBLEAdapter, callback,userdata) =
@@ -239,6 +246,7 @@ _adapter_set_callback_on_scan_found(handle::SBLEAdapter, callback,userdata) =
 
 function adapter_set_callback_on_scan_start(handle::SBLEAdapter, callback, userdata)
 	c_callback = @cfunction($callback, Cvoid, (SBLEAdapter, Ptr{Cvoid}))
+	_active_callbacks[handle] = c_callback  # prevent GC
 	_adapter_set_callback_on_scan_start(handle, c_callback, userdata)
 end
 _adapter_set_callback_on_scan_start(handle::SBLEAdapter, callback,userdata) =
@@ -248,6 +256,7 @@ _adapter_set_callback_on_scan_start(handle::SBLEAdapter, callback,userdata) =
 
 function adapter_set_callback_on_scan_stop(handle::SBLEAdapter, callback, userdata)
 	c_callback = @cfunction($callback, Cvoid, (SBLEAdapter, Ptr{Cvoid}))
+	_active_callbacks[handle] = c_callback  # prevent GC
 	_adapter_set_callback_on_scan_stop(handle, c_callback, userdata)
 end
 _adapter_set_callback_on_scan_stop(handle::SBLEAdapter, callback,userdata) =
@@ -256,6 +265,7 @@ _adapter_set_callback_on_scan_stop(handle::SBLEAdapter, callback,userdata) =
 
 function adapter_set_callback_on_scan_updated(handle::SBLEAdapter, callback, userdata)
 	c_callback = @cfunction($callback, Cvoid, (SBLEAdapter, SBLEPeripheral, Ptr{Cvoid}))
+	_active_callbacks[handle] = c_callback  # prevent GC
 	_adapter_set_callback_on_scan_updated(handle, c_callback, userdata)
 end
 _adapter_set_callback_on_scan_updated(handle::SBLEAdapter, callback,userdata) =
@@ -280,8 +290,8 @@ get_operating_system() =
 function get_version()
 	sblestring = _get_version()
 	GC.@preserve sblestring begin
-	output = unsafe_string(sblestring)
-		simpleble_free(sblestring)
+		output = unsafe_string(sblestring)
+		# simpleble_free(sblestring)
 	end
 	return output
 end
@@ -304,6 +314,7 @@ logging_set_level(level) =
 
 function logging_set_callback(callback)
 	c_callback = @cfunction($callback, Cvoid, (SimpleBLE_Log_Level, Cstring, Cstring, UInt32, Cstring, Cstring))
+	_active_callbacks[handle] = c_callback  # prevent GC
 	_logging_set_callback(c_callback)
 end
 _logging_set_callback(callback) =
@@ -313,8 +324,8 @@ _logging_set_callback(callback) =
 function peripheral_address(handle::SBLEPeripheral)
 	sblestring = _peripheral_address(handle)
 	GC.@preserve sblestring begin
-	output = unsafe_string(sblestring)
-		simpleble_free(sblestring)
+		output = unsafe_string(sblestring)
+		# simpleble_free(sblestring)
 	end
 	return output
 end
@@ -338,8 +349,8 @@ peripheral_disconnect(handle::SBLEPeripheral) =
 function peripheral_identifier(handle::SBLEAdapter)
 	sblestring = _peripheral_identifier(handle)
 	GC.@preserve sblestring begin
-	output = unsafe_string(sblestring)
-		simpleble_free(sblestring)
+		output = unsafe_string(sblestring)
+		# simpleble_free(sblestring)
 	end
 	return output
 end
@@ -357,8 +368,17 @@ data::Ptr{Ptr{UInt8}}, data_length::Ptr{Csize_t},
 userdata::Ptr{Cvoid}
 )
 =#
+function peripheral_indicate(handle::SBLEPeripheral, service, characteristic, callback)
+	function c_callback(handle, service, characteristic, data, data_length, userdata)
+		jdata = unsafe_wrap(Vector{UInt8}, data, data_length)
+		callback(jdata)
+		# simpleble_free(data)
+	end
+	peripheral_indicate(handle, service, characteristic, c_callback,C_NULL)
+end
 function peripheral_indicate(handle, service, characteristic, callback, userdata)
 	c_callback = @cfunction($callback, Cvoid, (SBLEPeripheral, SBLEUUID, SBLEUUID, Ptr{UInt8},Csize_t, Ptr{Cvoid}))
+	_active_callbacks[handle] = c_callback  # prevent GC
 	_peripheral_indicate(handle, service, characteristic, c_callback, userdata)
 end
 _peripheral_indicate(handle::SBLEPeripheral, service, characteristic, callback, userdata) =
@@ -401,12 +421,23 @@ callback takes
 handle::simpleble_peripheral_t,
 service::simpleble_uuid_t,
 characteristic::simpleble_uuid_t,
-data::Ptr{Ptr{UInt8}}, data_length::Ptr{Csize_t}, 
+data::Ptr{UInt8}, data_length::Csize_t, 
 userdata::Ptr{Cvoid}
 )
 =#
+function peripheral_notify(handle::SBLEPeripheral, service, characteristic, callback)
+	function c_callback(handle, service, characteristic, data, data_length, userdata)
+		jdata = unsafe_wrap(Vector{UInt8}, data, data_length)
+		callback(jdata)
+		# simpleble_free(data)
+	end
+	GC.@preserve callback c_callback begin
+		peripheral_notify(handle, service, characteristic, c_callback, C_NULL)
+	end
+end
 function peripheral_notify(handle::SBLEPeripheral, service, characteristic, callback, userdata)
 	c_callback = @cfunction($callback, Cvoid, (SBLEPeripheral, SBLEUUID, SBLEUUID, Ptr{UInt8},Csize_t, Ptr{Cvoid}))
+	_active_callbacks[handle] = c_callback  # prevent GC
 	_peripheral_notify(handle, service, characteristic, c_callback, userdata)
 end
 _peripheral_notify(handle::SBLEPeripheral, service, characteristic, callback, userdata) =
@@ -459,6 +490,7 @@ userdata::Ptr{Cvoid}
 =#
 function peripheral_set_callback_on_connected(handle, callback, userdata)
 	c_callback = @cfunction($callback, Cvoid, (SBLEPeripheral, Ptr{Cvoid}))
+	_active_callbacks[handle] = c_callback  # prevent GC
 	_peripheral_set_callback_on_connected(handle, c_callback, userdata)
 end
 _peripheral_set_callback_on_connected(handle::SBLEPeripheral, callback, userdata) =
@@ -476,6 +508,7 @@ userdata::Ptr{Cvoid}
 =#
 function peripheral_set_callback_on_disconnected(handle, callback, userdata)
 	c_callback = @cfunction($callback, Cvoid, (SBLEPeripheral, Ptr{Cvoid}))
+	_active_callbacks[handle] = c_callback  # prevent GC
 	_peripheral_set_callback_on_disconnected(handle, c_callback, userdata)
 end
 _peripheral_set_callback_on_disconnected(handle::SBLEPeripheral, callback, userdata) =
@@ -502,7 +535,21 @@ peripheral_unsubscribe(handle::SBLEPeripheral, service, characteristic) =
 		service::SBLEUUID,
 		characteristic::SBLEUUID,)::SimpleBLE_Error
 
-peripheral_write_command(handle::SBLEPeripheral, service, characteristic, data, data_length) =
+function peripheral_write_command(handle, service, characteristic, data::T) where T<:AbstractString
+	cdata = codeunits(data)
+	peripheral_write_command(handle, service, characteristic, cdata)
+end
+function peripheral_write_command(handle::SBLEPeripheral, service::SBLEService, characteristic::SBLECharacteristic, data)
+	peripheral_write_command(handle, service.uuid, characteristic.uuid, data)
+end
+function peripheral_write_command(handle::SBLEPeripheral, service::SBLEUUID, characteristic::SBLEUUID, data::T) where T<:AbstractString
+	cdata = codeunits(data)
+	peripheral_write_command(handle, service, characteristic, cdata)
+end
+function peripheral_write_command(handle::SBLEPeripheral, service::SBLEUUID, characteristic::SBLEUUID, data::T) where T<:AbstractArray
+	_peripheral_write_command(handle, service, characteristic, data, length(data))
+end
+_peripheral_write_command(handle::SBLEPeripheral, service, characteristic, data, data_length) =
 	@ccall simpleblepath.simpleble_peripheral_write_command(
 		handle::SBLEPeripheral,
 		service::SBLEUUID,

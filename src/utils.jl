@@ -22,7 +22,7 @@ function Base.write(peripheral::SBLEPeripheral, characteristic::Characteristic, 
 		err = peripheral_write_request(peripheral, characteristic.serviceuuid, characteristic.uuid, data)
 		err != SIMPLEBLE_SUCCESS && @error "Failed to write to Characteristic: $characteristic"
 	elseif type === :command
-		peripheral_write_request(peripheral, characteristic.serviceuuid, characteristic.uuid, data)
+		peripheral_write_command(peripheral, characteristic.serviceuuid, characteristic.uuid, data)
 		err != SIMPLEBLE_SUCCESS && @error "Failed to write to Characteristic: $characteristic"
 	else
 		error(ArgumentError("Unrecognized type $type"))
@@ -79,7 +79,7 @@ function find_peripheral(matchfunc, adapter; scantime=5_000, maxretrys = 5)
 				put!(foundmatchchannel, true)
 			end
 			return nothing
-		end, 
+		end,
 		C_NULL
 	)
 	adapter_set_callback_on_scan_updated(adapter, 
@@ -144,6 +144,8 @@ function connect_peripheral(func, matchperipheral)
 	connect(peripheral)
 	try
 		func(peripheral)
+	catch e
+		@error e
 	finally
 		while !disconnect(peripheral) sleep(1) end
 		# peripheral_release_handle(peripheral)
