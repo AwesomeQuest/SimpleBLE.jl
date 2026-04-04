@@ -4,7 +4,7 @@ using BaseDirs
 
 
 @static if !isfile(BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simpleble.dll")) || !isfile(BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simplecble.dll"))
-	let
+	BaseDirs.@promise_no_assign let
 		cdll = joinpath(@__DIR__, "..", "simplecble", "shared", "bin", "simplecble.dll")
 		dll = joinpath(@__DIR__, "..", "simplecble", "shared", "bin", "simpleble.dll")
 
