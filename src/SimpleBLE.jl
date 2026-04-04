@@ -16,7 +16,7 @@ using BaseDirs
 	end
 end
 BaseDirs.@promise_no_assign begin
-	sbledir = BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simplecble.dll")
+	global sbledir = BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simplecble.dll")
 end
 
 
