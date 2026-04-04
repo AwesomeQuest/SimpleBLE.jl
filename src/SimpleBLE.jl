@@ -7,6 +7,10 @@ using BaseDirs
 	let
 		cdll = joinpath(@__DIR__, "..", "simplecble", "shared", "bin", "simplecble.dll")
 		dll = joinpath(@__DIR__, "..", "simplecble", "shared", "bin", "simpleble.dll")
+
+		!isdir(BaseDirs.User.runtime("SimpleBLE.jl")) &&  mkdir(BaseDirs.User.runtime("SimpleBLE.jl"))
+		!isdir(BaseDirs.User.runtime("SimpleBLE.jl", "DLLs")) &&  mkdir(BaseDirs.User.runtime("SimpleBLE.jl", "DLLs"))
+
 		cp(cdll, BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simplecble.dll"); force=true)
 		cp(dll, BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simpleble.dll"); force=true)
 	end
