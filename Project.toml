@@ -1,6 +1,6 @@
 name = "SimpleBLE"
 uuid = "c43e3543-e659-46d0-a341-79c7b8740d4a"
-version = "0.2.11"
+version = "0.2.12"
 authors = ["Awesome Quest <torfit@gmail.com>"]
 
 [deps]

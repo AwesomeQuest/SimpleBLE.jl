@@ -3,8 +3,20 @@ using BaseDirs
 
 
 
-@static if !isfile(BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simpleble.dll")) || !isfile(BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simplecble.dll"))
-	BaseDirs.@promise_no_assign let
+# @static if !isfile(BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simpleble.dll")) || !isfile(BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simplecble.dll"))
+# 	BaseDirs.@promise_no_assign let
+# 		cdll = joinpath(@__DIR__, "..", "simplecble", "shared", "bin", "simplecble.dll")
+# 		dll = joinpath(@__DIR__, "..", "simplecble", "shared", "bin", "simpleble.dll")
+
+# 		!isdir(BaseDirs.User.runtime("SimpleBLE.jl")) &&  mkdir(BaseDirs.User.runtime("SimpleBLE.jl"))
+# 		!isdir(BaseDirs.User.runtime("SimpleBLE.jl", "DLLs")) &&  mkdir(BaseDirs.User.runtime("SimpleBLE.jl", "DLLs"))
+
+# 		cp(cdll, BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simplecble.dll"); force=true)
+# 		cp(dll, BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simpleble.dll"); force=true)
+# 	end
+# end
+function sbledir()
+	if !isfile(BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simpleble.dll")) || !isfile(BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simplecble.dll"))
 		cdll = joinpath(@__DIR__, "..", "simplecble", "shared", "bin", "simplecble.dll")
 		dll = joinpath(@__DIR__, "..", "simplecble", "shared", "bin", "simpleble.dll")
 
@@ -14,11 +26,7 @@ using BaseDirs
 		cp(cdll, BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simplecble.dll"); force=true)
 		cp(dll, BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simpleble.dll"); force=true)
 	end
-end
-function sbledir()
-	return BaseDirs.@promise_no_assign begin 
-		BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simplecble.dll")
-	end
+	return BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simplecble.dll")
 end
 
 
