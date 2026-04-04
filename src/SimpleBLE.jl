@@ -15,7 +15,7 @@ using BaseDirs
 		cp(dll, BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simpleble.dll"); force=true)
 	end
 end
-sbledir = BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simplecble.dll")
+BaseDirs.@promise_no_assign sbledir = BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simplecble.dll")
 
 
 active_callbacks = Base.CFunction[]
