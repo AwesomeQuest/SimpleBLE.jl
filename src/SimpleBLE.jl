@@ -1,7 +1,17 @@
 module SimpleBLE
 
+using BaseDirs
 
-sbledir = joinpath(@__DIR__, "..", "simplecble", "shared", "bin", "simplecble.dll")
+
+@static if !isfile(BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simpleble.dll")) || !isfile(BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simplecble.dll"))
+	let
+		cdll = joinpath(@__DIR__, "..", "simplecble", "shared", "bin", "simplecble.dll")
+		dll = joinpath(@__DIR__, "..", "simplecble", "shared", "bin", "simpleble.dll")
+		cp(cdll, BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simplecble.dll"); force=true)
+		cp(dll, BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simpleble.dll"); force=true)
+	end
+end
+sbledir = BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simplecble.dll")
 
 
 active_callbacks = Base.CFunction[]
