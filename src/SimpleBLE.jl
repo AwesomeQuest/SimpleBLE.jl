@@ -1,7 +1,7 @@
-BaseDirs.@promise_no_assign begin
 module SimpleBLE
-
 using BaseDirs
+BaseDirs.@promise_no_assign begin
+
 
 
 @static if !isfile(BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simpleble.dll")) || !isfile(BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simplecble.dll"))
