@@ -14,13 +14,15 @@ export identifier,
 	set_callback_on_connected,
 	set_callback_on_disconnected
 
+import Base
+
 ### The following are public function inteded for users
 
 
 function identifier(peripheral::Peripheral)
 	cstr = @ccall sbledir.simpleble_peripheral_identifier(peripheral::SBLEPERIPHERAL)::Cstring
 	return finalizer(unsafe_string(cstr)) do x
-		@async @warn "$(time_ns()): Freeing string with value $x"
+		# @async @warn "$(time_ns()): Freeing string with value $x"
 		free(pointer(cstr))
 	end
 end
@@ -28,7 +30,7 @@ end
 function address(peripheral::Peripheral)
 	cstr = @ccall sbledir.simpleble_peripheral_address(peripheral::SBLEPERIPHERAL)::Cstring
 	return finalizer(unsafe_string(cstr)) do x
-		@async @warn "$(time_ns()): Freeing string with value $x"
+		# @async @warn "$(time_ns()): Freeing string with value $x"
 		free(pointer(cstr))
 	end
 end
@@ -64,7 +66,7 @@ function peripheral_read(peripheral::Peripheral, service::S, characteristic::S) 
 		return nothing
 	end
 	return finalizer(unsafe_wrap(Vector{UInt8}, data_ptr[], data_length[])) do
-		@async @warn "Freeing data passed to peripheral_read $(data_ptr[])"
+		# @async @warn "Freeing data passed to peripheral_read $(data_ptr[])"
 		free(data_ptr[])
 	end
 end
@@ -89,7 +91,7 @@ function write_command(peripheral::Peripheral, service::S, characteristic::S, da
 	return err == SBLESUCCESS
 end
 
-function notify(callback, peripheral::Peripheral, service::S, characteristic::S) where S <: AbstractString
+function Base.notify(callback, peripheral::Peripheral, service::S, characteristic::S) where S <: AbstractString
 	s = SBLEUUID(service)
 	c = SBLEUUID(characteristic)
 	function adjcallback(peripheral, service, characteristic, data, data_length, userdata)

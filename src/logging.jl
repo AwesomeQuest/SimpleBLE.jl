@@ -13,5 +13,5 @@ simpleble_logging_set_level(level) = @ccall sbledir.simpleble_logging_set_level(
 function simpleble_logging_set_callback(callback)
 	c_callback = @cfunction($callback, Cvoid, (SBLELOGLEVEL, Cstring, Cstring, UInt32, Cstring, Cstring))
 	push!(active_callbacks, c_callback)
-	@ccall sbledir.simpleble_logging_set_callback(c_callback::Ptr{Cvoid})
+	@ccall sbledir.simpleble_logging_set_callback(c_callback::Ptr{Cvoid})::Cvoid
 end

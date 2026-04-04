@@ -32,7 +32,7 @@ struct SBLECHARACTERISTIC
 	uuid::SBLEUUID
 	can_read::Bool
 	can_write_request::Bool
-	can_write_command::Boo
+	can_write_command::Bool
 	can_notify::Bool
 	can_indicate::Bool
 	descriptor_count::Csize_t
@@ -78,7 +78,7 @@ mutable struct Adapter
 	ptr::SBLEADAPTER
 	function Adapter(x)
 		return finalizer(new(x)) do y
-			@async @warn "$(time_ns()): Finalizing Adapter $(y.ptr)"
+			# @async @warn "$(time_ns()): Finalizing Adapter $(y.ptr)"
 			@ccall sbledir.simpleble_adapter_release_handle(y.ptr::SBLEADAPTER)::Cvoid
 		end
 	end
@@ -91,12 +91,12 @@ mutable struct Peripheral
 	subscriptions::Set{Tuple{SBLEUUID,SBLEUUID}}
 	function Peripheral(x)
 		return finalizer(new(x, Set{Tuple{SBLEUUID,SBLEUUID}}())) do y
-			@async @warn "$(time_ns()): Finalizing Peripheral $(y.ptr)"
-			@ccall sbledir.simpleble_peripheral_set_callback_on_connected(y.ptr::SBLEADAPTER, C_NULL::Ptr{Cvoid})::SBLEERROR
-			@ccall sbledir.simpleble_peripheral_set_callback_on_disconnected(y.ptr::SBLEADAPTER, C_NULL::Ptr{Cvoid})::SBLEERROR
+			# @async @warn "$(time_ns()): Finalizing Peripheral $(y.ptr)"
+			@ccall sbledir.simpleble_peripheral_set_callback_on_connected(y.ptr::SBLEPERIPHERAL, C_NULL::Ptr{Cvoid})::SBLEERROR
+			@ccall sbledir.simpleble_peripheral_set_callback_on_disconnected(y.ptr::SBLEPERIPHERAL, C_NULL::Ptr{Cvoid})::SBLEERROR
 
 			for (s,c) in y.subscriptions
-				@ccall sbledir.simpleble_peripheral_unsubscribe(y.ptr::SBLEADAPTER, s::SBLEUUID, c::SBLEUUID)::SBLEERROR
+				@ccall sbledir.simpleble_peripheral_unsubscribe(y.ptr::SBLEPERIPHERAL, s::SBLEUUID, c::SBLEUUID)::SBLEERROR
 			end
 			empty!(y.subscriptions)
 			@ccall sbledir.simpleble_peripheral_release_handle(y.ptr::SBLEPERIPHERAL)::Cvoid

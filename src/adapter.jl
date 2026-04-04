@@ -22,7 +22,7 @@ end
 function identifier(adapter::Adapter)
 	cstr = @ccall sbledir.simpleble_adapter_identifier(adapter::SBLEADAPTER)::Cstring
 	return finalizer(unsafe_string(cstr)) do x
-		@async @warn "$(time_ns()): Freeing string with value $x"
+		# @async @warn "$(time_ns()): Freeing string with value $x"
 		free(pointer(cstr))
 	end
 end
@@ -30,7 +30,7 @@ end
 function address(peripheral::Adapter)
 	cstr = @ccall sbledir.simpleble_adapter_address(peripheral::SBLEADAPTER)::Cstring
 	return finalizer(unsafe_string(cstr)) do x
-		@async @warn "$(time_ns()): Freeing string with value $x"
+		# @async @warn "$(time_ns()): Freeing string with value $x"
 		free(pointer(cstr))
 	end
 end

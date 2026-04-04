@@ -1,3 +1,6 @@
+export find_peripheral
+
+
 """
 Convenience function for finding a peripheral.
 matchfunc must take one string argument and return a bool
@@ -5,8 +8,8 @@ matchfunc must take one string argument and return a bool
 function find_peripheral(matchfunc, adapter)
 	adapterid = identifier(adapter)
 	perich = Channel{Peripheral}(Inf)
-	set_callback_on_scan_start(x->@info("Scan starting on $adapterid"), adapter)
-	set_callback_on_scan_stop(x->@info("Scanning stopping on $adapterid"), adapter)
+	set_callback_on_scan_start(()->@info("Scan starting on $adapterid"), adapter)
+	set_callback_on_scan_stop(()->@info("Scanning stopping on $adapterid"), adapter)
 	set_callback_on_scan_found(adapter) do peri
 		id = identifier(peri)
 		adr = address(peri)
