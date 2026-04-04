@@ -1,10 +1,11 @@
+BaseDirs.@promise_no_assign begin
 module SimpleBLE
 
 using BaseDirs
 
 
 @static if !isfile(BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simpleble.dll")) || !isfile(BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simplecble.dll"))
-	BaseDirs.@promise_no_assign let
+	let
 		cdll = joinpath(@__DIR__, "..", "simplecble", "shared", "bin", "simplecble.dll")
 		dll = joinpath(@__DIR__, "..", "simplecble", "shared", "bin", "simpleble.dll")
 
@@ -15,9 +16,7 @@ using BaseDirs
 		cp(dll, BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simpleble.dll"); force=true)
 	end
 end
-BaseDirs.@promise_no_assign begin
-	global sbledir = BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simplecble.dll")
-end
+sbledir = BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simplecble.dll")
 
 
 active_callbacks = Base.CFunction[]
@@ -72,3 +71,4 @@ end
 
 
 end # module SimpleBLE
+end
