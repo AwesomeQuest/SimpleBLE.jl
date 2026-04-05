@@ -13,7 +13,7 @@ Enter Pkg mode by typing ] in the REPL
 # SimpleBLE basics
 Bluetooth is a hierarchy
 - Bluetooth devices are called peripherals
-  - Those peripherals have services that they provide
+  - Those peripherals have services that then provide
     - Services have charecteristics
       - Can be read and written to
       - Characteristics have descriptors
