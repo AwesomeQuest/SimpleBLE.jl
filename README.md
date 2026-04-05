@@ -19,7 +19,7 @@ Bluetooth is a hierarchy
       - Characteristics have descriptors
         - Can be read and written to
 
-# Basic Usage example
+# Usage example
 ```julia
 
 const SERVICE_UUID					= "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
