@@ -15,7 +15,8 @@ Bluetooth is a hierarchy
 - Bluetooth devices are called peripherals
   - Those peripherals have services 
     - Services have charecteristics
-      - Charecteristics can be read and written to
+      - Characteristics can be read and written to
+      - Characteristics can also be either notifyed or indicated (assigned callbacks that recive data whenever it is sent)
       - Characteristics have descriptors
         - Descriptors can be read and written to
 
