@@ -13,17 +13,16 @@ Enter Pkg mode by typing ] in the REPL
 # SimpleBLE basics
 Bluetooth is a hierarchy
 - Bluetooth devices are called peripherals
-  - Those peripherals have services that they provide
+  - Those peripherals have services 
     - Services have charecteristics
-      - Can be read and written to
+      - Characteristics can be read and written to
+      - Characteristics can also be either notifyed or indicated (assigned callbacks that recive data whenever it is sent)
       - Characteristics have descriptors
-        - Can be read and written to
+        - Descriptors can be read and written to
 
-# Basic Usage example
+# Usage example
 ```julia
-# You generally need to know the UUIDs of things in advance
-# since they don't have names, but you can query a peripheral
-# about its properties with `peripheral_services_get`
+
 const SERVICE_UUID					= "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
 const CHARACTERISTIC_UUID_TX		= "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 const CHARACTERISTIC_UUID_RX		= "6d68ef76-79f6-4b8a-bf9d-05fc906b8290"
@@ -32,22 +31,44 @@ const CHARACTERISTIC_UUID_CONFIG	= "3c3d5e6f-7a8b-4c9d-9e0f-1a2b3c4d5e6f"
 using SimpleBLE
 using JSON
 
-# This function does things that I like, maybe you don't like them, change them
-connect_peripheral(peri->begin
-	periid = peripheral_identifier(peri)
-	return occursin("recognizable part of name of peripheral", periid)
-end) do peri
-	rxchar = Characteristic(SERVICE_UUID, CHARACTERISTIC_UUID_RX)
-	txchar = Characteristic(SERVICE_UUID, CHARACTERISTIC_UUID_TX)
-	confchar = Characteristic(SERVICE_UUID, CHARACTERISTIC_UUID_CONFIG)
+adapter = get_adapter(0)
+peri = find_peripheral(adapter) do id
+	occursin("SiNW", id)
+end
+connect(peri) do
+	# You generally need to know the UUIDs of things in advance
+	# since they don't have names, but you can query a peripheral
+	# about its properties with `peripheral_services_get`
+	SERVICE_UUID				= "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
+	CHARACTERISTIC_UUID_TX		= "beb5483e-36e1-4688-b7f5-ea07361b26a8"
+	CHARACTERISTIC_UUID_RX		= "6d68ef76-79f6-4b8a-bf9d-05fc906b8290"
+	CHARACTERISTIC_UUID_CONFIG	= "3c3d5e6f-7a8b-4c9d-9e0f-1a2b3c4d5e6f"
 
-	write(peri, rxchar, JSON.json(Dict("cmd"=>"start")))
-	write(peri, rxchar, JSON.json(Dict("cmd"=>"set_rate", "rate"=>0)))
-	sleep(1)
-	responce = read(peri, txchar) |> JSON.parse
-	println(JSON.json(responce))
-	write(peri, rxchar, JSON.json("cmd"=>"get_config"))
-	responce = read(peri, txchar) |> JSON.parse
-	println(JSON.json(responce))
+
+	@info "Writing Commands"
+	write_request(peri, SERVICE_UUID, CHARACTERISTIC_UUID_RX, JSON.json("cmd" => "start"))
+	write_request(peri, SERVICE_UUID, CHARACTERISTIC_UUID_RX, JSON.json(Dict("cmd"=>"set_rate", "rate"=>samplerate)))
+
+	sleep(0.5)
+
+	@info "Setting up data stream"
+	currtime = replace(string(now()), ':'=>"", '-'=>"")
+	f = open("logs_$currtime.csv", "w")
+	writedlm(f, ["Time [ms]" "Currrent"], ',')
+	counter = 0
+	notify(peri, SERVICE_UUID, CHARACTERISTIC_UUID_TX) do data
+		counter += 1
+		jdata = JSON.parse(String(data))
+		writedlm(f, Any[jdata["timestamp"] jdata["current"]], ',')
+	end
+	@info "Press enter to end stream"
+	dispnum = true
+	errormonitor(@async while dispnum
+		print("\b"^100*"Total samples collected: $counter")
+		sleep(1)
+	end)
+	readline()
+	dispnum = false
+	close(f)
 end
 ```
