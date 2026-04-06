@@ -2,7 +2,23 @@ module SimpleBLE
 
 
 @static if Sys.iswindows()
-	Libc.Libdl.dlopen(joinpath(@__DIR__, "..", "simplecble","shared","bin","simplecble.dll"))
+	bindir = joinpath(@__DIR__, "..", "simplecble","shared","bin")
+	dll = joinpath(bindir, "simpleble.dll")
+	cdll = joinpath(bindir, "simplecble.dll")
+	tdir = tempname()
+	mkdir(tdir)
+	@show tdir
+	@show isdir(tdir)
+	cp(dll, joinpath(tdir, "simpleble.dll"))
+	cp(cdll, joinpath(tdir, "simplecble.dll"))
+	hdl = Libc.Libdl.dlopen(joinpath(tdir, "simplecble.dll"))
+	@show isfile(joinpath(tdir, "simpleble.dll"))
+
+	atexit() do 
+		Libc.Libdl.dlclose(hdl)
+		rm(joinpath(tdir, "simpleble.dll"))
+		rm(joinpath(tdir, "simplecble.dll"))
+	end
 else
 	using SimpleBLE_jll
 end
