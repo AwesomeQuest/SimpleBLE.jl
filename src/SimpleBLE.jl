@@ -1,6 +1,4 @@
 module SimpleBLE
-using BaseDirs
-
 
 
 @static if Sys.iswindows()
