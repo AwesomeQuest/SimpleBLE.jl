@@ -3,20 +3,10 @@ using BaseDirs
 
 
 
-@static if !isfile(BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simpleble.dll")) || !isfile(BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simplecble.dll"))
-	BaseDirs.@promise_no_assign let
-		cdll = joinpath(@__DIR__, "..", "simplecble", "shared", "bin", "simplecble.dll")
-		dll = joinpath(@__DIR__, "..", "simplecble", "shared", "bin", "simpleble.dll")
-
-		!isdir(BaseDirs.User.runtime("SimpleBLE.jl")) &&  mkdir(BaseDirs.User.runtime("SimpleBLE.jl"))
-		!isdir(BaseDirs.User.runtime("SimpleBLE.jl", "DLLs")) &&  mkdir(BaseDirs.User.runtime("SimpleBLE.jl", "DLLs"))
-
-		cp(cdll, BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simplecble.dll"); force=true)
-		cp(dll, BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simpleble.dll"); force=true)
-	end
-end
-function sbledir()
-	return BaseDirs.User.runtime("SimpleBLE.jl", "DLLs", "simplecble.dll")
+@static if Sys.iswindows()
+	Libc.Libdl.dlopen(joinpath(@__DIR__, "..", "simplecble","shared","bin","simplecble.dll"))
+else
+	using SimpleBLE_jll
 end
 
 
@@ -24,7 +14,7 @@ active_callbacks = Base.CFunction[]
 
 
 
-free(x) = @ccall sbledir().simpleble_free(x::Ptr{Cvoid})::Cvoid
+free(x) = ccall((:simpleble_free, :simplecble), Cvoid, (Ptr{Cvoid}, ), x)
 
 
 include("types.jl")
@@ -33,10 +23,10 @@ include("peripheral.jl")
 include("logging.jl")
 include("utils.jl")
 
-simpleble_get_operating_system() = @ccall sbledir().simpleble_get_operating_system()::SBLEOS
+simpleble_get_operating_system() = ccall((:simpleble_get_operating_system, :simplecble), SBLEOS, ())
 
 function simpleble_get_version()
-	c_str = @ccall sbledir().simpleble_get_version()::Cstring
+	c_str = ccall((:simpleble_get_version, :simplecble), Cstring, ())
 	return unsafe_string(c_str)
 end
 
@@ -46,24 +36,24 @@ end
 		@info "Exiting and cleaning up"
 		WinAdapter.ptr == C_NULL && return nothing
 		@info Clearing callbacks
-		@ccall sbledir().simpleble_adapter_set_callback_on_scan_start(WinAdapter::SBLEADAPTER, C_NULL::Ptr{Cvoid})::SBLEERROR
-		@ccall sbledir().simpleble_adapter_set_callback_on_scan_stop(WinAdapter::SBLEADAPTER, C_NULL::Ptr{Cvoid})::SBLEERROR
-		@ccall sbledir().simpleble_adapter_set_callback_on_scan_found(WinAdapter::SBLEADAPTER, C_NULL::Ptr{Cvoid})::SBLEERROR
-		@ccall sbledir().simpleble_adapter_set_callback_on_scan_updated(WinAdapter::SBLEADAPTER, C_NULL::Ptr{Cvoid})::SBLEERROR
+		ccall((:simpleble_adapter_set_callback_on_scan_start, :simplecble), SBLEERROR, (SBLEADAPTER, Ptr{Cvoid}), WinAdapter, C_NULL)
+		ccall((:simpleble_adapter_set_callback_on_scan_stop, :simplecble), SBLEERROR, (SBLEADAPTER, Ptr{Cvoid}), WinAdapter, C_NULL)
+		ccall((:simpleble_adapter_set_callback_on_scan_found, :simplecble), SBLEERROR, (SBLEADAPTER, Ptr{Cvoid}), WinAdapter, C_NULL)
+		ccall((:simpleble_adapter_set_callback_on_scan_updated, :simplecble), SBLEERROR, (SBLEADAPTER, Ptr{Cvoid}), WinAdapter, C_NULL)
 
 		@info "Stopping potential scan"
 		actref = Ref{Bool}()
-		err = @ccall sbledir().simpleble_adapter_scan_is_active(WinAdapter::SBLEADAPTER, actref::Ptr{Bool})::SBLEERROR
+		err = ccall((:simpleble_adapter_scan_is_active, :simplecble), SBLEERROR, (SBLEADAPTER, Ptr{Bool}), WinAdapter, actref)
 		while err == SBLEFAILURE
 			@error "Failed to get scan active"
-			err = @ccall sbledir().simpleble_adapter_scan_is_active(WinAdapter::SBLEADAPTER, actref::Ptr{Bool})::SBLEERROR
+			err = ccall((:simpleble_adapter_scan_is_active, :simplecble), SBLEERROR, (SBLEADAPTER, Ptr{Bool}), WinAdapter, actref)
 			sleep(0.2)
 		end
 		if actref[]
-			err = @ccall sbledir().simpleble_adapter_scan_stop(WinAdapter::SBLEADAPTER)::SBLEERROR
+			err = ccall((:simpleble_adapter_scan_stop, :simplecble), SBLEERROR, (SBLEADAPTER, ), WinAdapter)
 			while err == SBLEFAILURE
 				@error "Failed to stop scan"
-				err = @ccall sbledir().simpleble_adapter_scan_stop(WinAdapter::SBLEADAPTER)::SBLEERROR
+				err = ccall((:simpleble_adapter_scan_stop, :simplecble), SBLEERROR, (SBLEADAPTER, ), WinAdapter)
 				sleep(0.2)
 			end
 		end

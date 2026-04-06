@@ -79,7 +79,7 @@ mutable struct Adapter
 	function Adapter(x)
 		return finalizer(new(x)) do y
 			# @async @warn "$(time_ns()): Finalizing Adapter $(y.ptr)"
-			@ccall sbledir().simpleble_adapter_release_handle(y.ptr::SBLEADAPTER)::Cvoid
+			ccall((:simpleble_adapter_release_handle, :simplecble), Cvoid, (SBLEADAPTER, ), y.ptr)
 		end
 	end
 end
@@ -92,14 +92,14 @@ mutable struct Peripheral
 	function Peripheral(x)
 		return finalizer(new(x, Set{Tuple{SBLEUUID,SBLEUUID}}())) do y
 			# @async @warn "$(time_ns()): Finalizing Peripheral $(y.ptr)"
-			@ccall sbledir().simpleble_peripheral_set_callback_on_connected(y.ptr::SBLEPERIPHERAL, C_NULL::Ptr{Cvoid})::SBLEERROR
-			@ccall sbledir().simpleble_peripheral_set_callback_on_disconnected(y.ptr::SBLEPERIPHERAL, C_NULL::Ptr{Cvoid})::SBLEERROR
+			ccall((:simpleble_peripheral_set_callback_on_connected, :simplecble), SBLEERROR, (SBLEPERIPHERAL, Ptr{Cvoid}), y.ptr, C_NULL)
+			ccall((:simpleble_peripheral_set_callback_on_disconnected, :simplecble), SBLEERROR, (SBLEPERIPHERAL, Ptr{Cvoid}), y.ptr, C_NULL)
 
 			for (s,c) in y.subscriptions
-				@ccall sbledir().simpleble_peripheral_unsubscribe(y.ptr::SBLEPERIPHERAL, s::SBLEUUID, c::SBLEUUID)::SBLEERROR
+				ccall((:simpleble_peripheral_unsubscribe, :simplecble), SBLEERROR, (SBLEPERIPHERAL, SBLEUUID, SBLEUUID), y.ptr, s, c)
 			end
 			empty!(y.subscriptions)
-			@ccall sbledir().simpleble_peripheral_release_handle(y.ptr::SBLEPERIPHERAL)::Cvoid
+			ccall((:simpleble_peripheral_release_handle, :simplecble), Cvoid, (SBLEPERIPHERAL, ), y.ptr)
 		end
 	end
 end
