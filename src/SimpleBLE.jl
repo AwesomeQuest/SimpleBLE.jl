@@ -23,32 +23,20 @@ function simpleble_get_version()
 	return unsafe_string(c_str)
 end
 
-@static if Sys.iswindows()
-	global WinAdapter = Adapter(C_NULL)
-	atexit() do
-		@info "Exiting and cleaning up"
-		WinAdapter.ptr == C_NULL && return nothing
-		@info Clearing callbacks
-		ccall((:simpleble_adapter_set_callback_on_scan_start, :simplecble), SBLEERROR, (SBLEADAPTER, Ptr{Cvoid}), WinAdapter, C_NULL)
-		ccall((:simpleble_adapter_set_callback_on_scan_stop, :simplecble), SBLEERROR, (SBLEADAPTER, Ptr{Cvoid}), WinAdapter, C_NULL)
-		ccall((:simpleble_adapter_set_callback_on_scan_found, :simplecble), SBLEERROR, (SBLEADAPTER, Ptr{Cvoid}), WinAdapter, C_NULL)
-		ccall((:simpleble_adapter_set_callback_on_scan_updated, :simplecble), SBLEERROR, (SBLEADAPTER, Ptr{Cvoid}), WinAdapter, C_NULL)
+global adapters = Adapter[]
+atexit() do
+	for a in adapters
+		ccall((:simpleble_adapter_set_callback_on_scan_start, :simplecble), SBLEERROR, (SBLEADAPTER, Ptr{Cvoid}), a, C_NULL)
+		ccall((:simpleble_adapter_set_callback_on_scan_stop, :simplecble), SBLEERROR, (SBLEADAPTER, Ptr{Cvoid}), a, C_NULL)
+		ccall((:simpleble_adapter_set_callback_on_scan_found, :simplecble), SBLEERROR, (SBLEADAPTER, Ptr{Cvoid}), a, C_NULL)
+		ccall((:simpleble_adapter_set_callback_on_scan_updated, :simplecble), SBLEERROR, (SBLEADAPTER, Ptr{Cvoid}), a, C_NULL)
 
-		@info "Stopping potential scan"
 		actref = Ref{Bool}()
 		err = ccall((:simpleble_adapter_scan_is_active, :simplecble), SBLEERROR, (SBLEADAPTER, Ptr{Bool}), WinAdapter, actref)
-		while err == SBLEFAILURE
-			@error "Failed to get scan active"
-			err = ccall((:simpleble_adapter_scan_is_active, :simplecble), SBLEERROR, (SBLEADAPTER, Ptr{Bool}), WinAdapter, actref)
-			sleep(0.2)
-		end
+		err == SBLEFAILURE && @error "Failed to get scan acitve"
 		if actref[]
 			err = ccall((:simpleble_adapter_scan_stop, :simplecble), SBLEERROR, (SBLEADAPTER, ), WinAdapter)
-			while err == SBLEFAILURE
-				@error "Failed to stop scan"
-				err = ccall((:simpleble_adapter_scan_stop, :simplecble), SBLEERROR, (SBLEADAPTER, ), WinAdapter)
-				sleep(0.2)
-			end
+			err == SBLEFAILURE && @error "Failed to stop scan"
 		end
 	end
 end
