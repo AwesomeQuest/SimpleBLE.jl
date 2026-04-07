@@ -1,4 +1,5 @@
-export find_peripheral
+export find_peripheral,
+	connect
 
 
 """
