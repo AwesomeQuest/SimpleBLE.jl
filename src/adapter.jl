@@ -15,8 +15,8 @@ export get_adapter,
 
 function get_adapter(i)
 	adapter = ccall((:simpleble_adapter_get_handle, :simplecble), Ptr{Cvoid}, (Csize_t, ), i)
-	global WinAdapter = Adapter(adapter)
-	return WinAdapter
+	push!(adapters, adapter)
+	return adapter
 end
 
 function identifier(adapter::Adapter)
