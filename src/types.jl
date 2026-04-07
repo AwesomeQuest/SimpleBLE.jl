@@ -1,4 +1,4 @@
-
+import Base
 
 ### The following are internal types not inteded for users
 
@@ -23,9 +23,20 @@ struct SBLEUUID
 		return new(NTuple{SIMPLEBLE_UUID_STR_LEN, Cchar}(out))
 	end
 end
+const NULL_UUID = SBLEUUID(zeros(Cchar, SIMPLEBLE_UUID_STR_LEN) |> NTuple{SIMPLEBLE_UUID_STR_LEN, Cchar})
+function Base.show(io::IO, x::SBLEUUID)
+	if x == NULL_UUID
+		print(io, "00000000-0000-0000-0000-00000000000")
+	else
+		print(io, (String∘Vector{UInt8}∘collect)(x.value))
+	end
+end
 
 struct SBLEDESCRIPTOR
 	uuid::SBLEUUID
+end
+function Base.show(io::IO, x::SBLEDESCRIPTOR)
+	print(io, "Descriptor with uuid: $(x.uuid)")
 end
 
 struct SBLECHARACTERISTIC
@@ -38,6 +49,9 @@ struct SBLECHARACTERISTIC
 	descriptor_count::Csize_t
 	descriptors::NTuple{SIMPLEBLE_DESCRIPTOR_MAX_COUNT, SBLEDESCRIPTOR}
 end
+function Base.show(io::IO, x::SBLEDESCRIPTOR)
+	print(io, "Characteristic: uuid:$(x.uuid), read:$(x.can_read), request:$(x.can_write_request), command:$(x.can_write_command), notify:$(x.can_notify), indicate:$(x.can_indicate), descriptor count:$(x.descriptor_count)")
+end
 
 struct SBLESERVICE
 	uuid::SBLEUUID
@@ -45,6 +59,10 @@ struct SBLESERVICE
 	data::NTuple{27, UInt8}
 	characteristic_count::Csize_t
 	characteristics::NTuple{SIMPLEBLE_CHARACTERISTIC_MAX_COUNT, SBLECHARACTERISTIC}
+end
+function Base.show(io::IO, x::SBLEDESCRIPTOR)
+	data_as_string = String(collect(x.data[1:x.data_length]))
+	print(io, "Sercive: uuid:$(x.uuid), data:$data_as_string, characteristic count:$(x.characteristic_count)")
 end
 
 struct SBLEMANUFACTURERDATA
@@ -73,19 +91,20 @@ end
 
 ### The following are types used by julia
 
-# Only ever create a adapter alongside a ccall that returns a handle
+# Only ever create a adapter when you know you need to release it
 mutable struct Adapter
 	ptr::SBLEADAPTER
 	function Adapter(x)
 		return finalizer(new(x)) do y
 			# @async @warn "$(time_ns()): Finalizing Adapter $(y.ptr)"
+			y.ptr == C_NULL && return nothing
 			ccall((:simpleble_adapter_release_handle, :simplecble), Cvoid, (SBLEADAPTER, ), y.ptr)
 		end
 	end
 end
 Base.cconvert(::Type{SBLEADAPTER}, x::Adapter) = x.ptr
 
-# Only ever create a peripheral alongside a ccall that returns a handle
+# Only ever create a peripheral when you know you need to release it
 mutable struct Peripheral
 	ptr::SBLEPERIPHERAL
 	subscriptions::Set{Tuple{SBLEUUID,SBLEUUID}}
