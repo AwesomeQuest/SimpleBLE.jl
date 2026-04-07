@@ -2,3 +2,13 @@ name = "SimpleBLE"
 uuid = "c43e3543-e659-46d0-a341-79c7b8740d4a"
 version = "0.2.15"
 authors = ["Awesome Quest <torfit@gmail.com>"]
+
+[deps]
+Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+SimpleBLE_jll = "65d2f289-9923-54e7-9bd2-c5e9669d2a86"
+ZipArchives = "49080126-0e18-4c2a-b176-c102e4b3760c"
+
+[compat]
+Pkg = "1.12.1"
+SimpleBLE_jll = "0.12.1"
+ZipArchives = "2.6.0"
