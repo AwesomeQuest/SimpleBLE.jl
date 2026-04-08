@@ -10,4 +10,3 @@ ZipArchives = "49080126-0e18-4c2a-b176-c102e4b3760c"
 
 [compat]
 SimpleBLE_jll = "0.12.1"
-ZipArchives = "2.6.0"
