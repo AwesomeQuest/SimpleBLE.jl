@@ -49,7 +49,7 @@ struct SBLECHARACTERISTIC
 	descriptor_count::Csize_t
 	descriptors::NTuple{SIMPLEBLE_DESCRIPTOR_MAX_COUNT, SBLEDESCRIPTOR}
 end
-function Base.show(io::IO, x::SBLEDESCRIPTOR)
+function Base.show(io::IO, x::SBLECHARACTERISTIC)
 	print(io, "Characteristic: uuid:$(x.uuid), read:$(x.can_read), request:$(x.can_write_request), command:$(x.can_write_command), notify:$(x.can_notify), indicate:$(x.can_indicate), descriptor count:$(x.descriptor_count)")
 end
 
@@ -60,7 +60,7 @@ struct SBLESERVICE
 	characteristic_count::Csize_t
 	characteristics::NTuple{SIMPLEBLE_CHARACTERISTIC_MAX_COUNT, SBLECHARACTERISTIC}
 end
-function Base.show(io::IO, x::SBLEDESCRIPTOR)
+function Base.show(io::IO, x::SBLESERVICE)
 	data_as_string = String(collect(x.data[1:x.data_length]))
 	print(io, "Sercive: uuid:$(x.uuid), data:$data_as_string, characteristic count:$(x.characteristic_count)")
 end
@@ -98,7 +98,7 @@ mutable struct Adapter
 		return finalizer(new(x)) do y
 			# @async @warn "$(time_ns()): Finalizing Adapter $(y.ptr)"
 			y.ptr == C_NULL && return nothing
-			ccall((:simpleble_adapter_release_handle, :simplecble), Cvoid, (SBLEADAPTER, ), y.ptr)
+			ccall((:simpleble_adapter_release_handle, simplecble), Cvoid, (SBLEADAPTER, ), y.ptr)
 		end
 	end
 end
@@ -111,14 +111,14 @@ mutable struct Peripheral
 	function Peripheral(x)
 		return finalizer(new(x, Set{Tuple{SBLEUUID,SBLEUUID}}())) do y
 			# @async @warn "$(time_ns()): Finalizing Peripheral $(y.ptr)"
-			ccall((:simpleble_peripheral_set_callback_on_connected, :simplecble), SBLEERROR, (SBLEPERIPHERAL, Ptr{Cvoid}), y.ptr, C_NULL)
-			ccall((:simpleble_peripheral_set_callback_on_disconnected, :simplecble), SBLEERROR, (SBLEPERIPHERAL, Ptr{Cvoid}), y.ptr, C_NULL)
+			ccall((:simpleble_peripheral_set_callback_on_connected, simplecble), SBLEERROR, (SBLEPERIPHERAL, Ptr{Cvoid}), y.ptr, C_NULL)
+			ccall((:simpleble_peripheral_set_callback_on_disconnected, simplecble), SBLEERROR, (SBLEPERIPHERAL, Ptr{Cvoid}), y.ptr, C_NULL)
 
 			for (s,c) in y.subscriptions
-				ccall((:simpleble_peripheral_unsubscribe, :simplecble), SBLEERROR, (SBLEPERIPHERAL, SBLEUUID, SBLEUUID), y.ptr, s, c)
+				ccall((:simpleble_peripheral_unsubscribe, simplecble), SBLEERROR, (SBLEPERIPHERAL, SBLEUUID, SBLEUUID), y.ptr, s, c)
 			end
 			empty!(y.subscriptions)
-			ccall((:simpleble_peripheral_release_handle, :simplecble), Cvoid, (SBLEPERIPHERAL, ), y.ptr)
+			ccall((:simpleble_peripheral_release_handle, simplecble), Cvoid, (SBLEPERIPHERAL, ), y.ptr)
 		end
 	end
 end

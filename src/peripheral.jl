@@ -25,7 +25,7 @@ import Base
 
 
 function identifier(peripheral::Peripheral)
-	cstr = ccall((:simpleble_peripheral_identifier, :simplecble), Cstring, (SBLEPERIPHERAL, ), peripheral)
+	cstr = ccall((:simpleble_peripheral_identifier, simplecble), Cstring, (SBLEPERIPHERAL, ), peripheral)
 	return finalizer(unsafe_string(cstr)) do x
 		# @async @warn "$(time_ns()): Freeing string with value $x"
 		free(pointer(cstr))
@@ -33,34 +33,34 @@ function identifier(peripheral::Peripheral)
 end
 
 function address(peripheral::Peripheral)
-	cstr = ccall((:simpleble_peripheral_address, :simplecble), Cstring, (SBLEPERIPHERAL, ), peripheral)
+	cstr = ccall((:simpleble_peripheral_address, simplecble), Cstring, (SBLEPERIPHERAL, ), peripheral)
 	return finalizer(unsafe_string(cstr)) do x
 		# @async @warn "$(time_ns()): Freeing string with value $x"
 		free(pointer(cstr))
 	end
 end
 
-const address_type(peripheral::Peripheral) = ccall((:simpleble_peripheral_address_type, :simplecble), SBLEADDRESSTYPE, (SBLEPERIPHERAL, ), peripheral)
+const address_type(peripheral::Peripheral) = ccall((:simpleble_peripheral_address_type, simplecble), SBLEADDRESSTYPE, (SBLEPERIPHERAL, ), peripheral)
 
-const peripheral_rssi(peripheral::Peripheral) = ccall((:simpleble_peripheral_rssi, :simplecble), UInt16, (SBLEPERIPHERAL, ), peripheral)
+const peripheral_rssi(peripheral::Peripheral) = ccall((:simpleble_peripheral_rssi, simplecble), UInt16, (SBLEPERIPHERAL, ), peripheral)
 
-const peripheral_tx_power(peripheral::Peripheral) = ccall((:simpleble_peripheral_tx_power, :simplecble), UInt16, (SBLEPERIPHERAL, ), peripheral)
+const peripheral_tx_power(peripheral::Peripheral) = ccall((:simpleble_peripheral_tx_power, simplecble), UInt16, (SBLEPERIPHERAL, ), peripheral)
 
-const peripheral_mtu(peripheral::Peripheral) = ccall((:simpleble_peripheral_mtu, :simplecble), UInt16, (SBLEPERIPHERAL, ), peripheral)
+const peripheral_mtu(peripheral::Peripheral) = ccall((:simpleble_peripheral_mtu, simplecble), UInt16, (SBLEPERIPHERAL, ), peripheral)
 
 function connect(peripheral::Peripheral)
-	err = ccall((:simpleble_peripheral_connect, :simplecble), SBLEERROR, (SBLEPERIPHERAL, ), peripheral)
+	err = ccall((:simpleble_peripheral_connect, simplecble), SBLEERROR, (SBLEPERIPHERAL, ), peripheral)
 	return err == SBLESUCCESS
 end
 
 function disconnect(peripheral::Peripheral)
-	err = ccall((:simpleble_peripheral_disconnect, :simplecble), SBLEERROR, (SBLEPERIPHERAL, ), peripheral)
+	err = ccall((:simpleble_peripheral_disconnect, simplecble), SBLEERROR, (SBLEPERIPHERAL, ), peripheral)
 	return err == SBLESUCCESS
 end
 
 function is_connected(peripheral::Peripheral)
 	ret = Ref{Bool}()
-	err = ccall((:simpleble_peripheral_is_connected, :simplecble), SBLEERROR, (SBLEPERIPHERAL, Ptr{Bool}), peripheral, ret)
+	err = ccall((:simpleble_peripheral_is_connected, simplecble), SBLEERROR, (SBLEPERIPHERAL, Ptr{Bool}), peripheral, ret)
 	if err == SBLEFAILURE
 		@error "Failed to check connection"
 		return nothing
@@ -70,7 +70,7 @@ end
 
 function is_connectable(peripheral::Peripheral)
 	ret = Ref{Bool}()
-	err = ccall((:simpleble_peripheral_is_connectable, :simplecble), SBLEERROR, (SBLEADAPTER, Ptr{Bool}), peripheral, ret)
+	err = ccall((:simpleble_peripheral_is_connectable, simplecble), SBLEERROR, (SBLEADAPTER, Ptr{Bool}), peripheral, ret)
 	if err == SBLEFAILURE
 		@error "Failed to check scan active"
 		return nothing
@@ -80,7 +80,7 @@ end
 
 function is_paired(peripheral::Peripheral)
 	ret = Ref{Bool}()
-	err = ccall((:simpleble_peripheral_is_paired, :simplecble), SBLEERROR, (SBLEADAPTER, Ptr{Bool}), peripheral, ret)
+	err = ccall((:simpleble_peripheral_is_paired, simplecble), SBLEERROR, (SBLEADAPTER, Ptr{Bool}), peripheral, ret)
 	if err == SBLEFAILURE
 		@error "Failed to check scan active"
 		return nothing
@@ -88,14 +88,14 @@ function is_paired(peripheral::Peripheral)
 	return ret[]
 end
 
-const unpair(peripheral::Peripheral) = ccall((:simpleble_peripheral_unpair, :simplecble), SBLEERROR, (SBLEPERIPHERAL, ), peripheral)
+const unpair(peripheral::Peripheral) = ccall((:simpleble_peripheral_unpair, simplecble), SBLEERROR, (SBLEPERIPHERAL, ), peripheral)
 
 function services(peripheral::Peripheral)
-	count = ccall((:simpleble_peripheral_services_count, :simplecble), Csize_t, (SBLEPERIPHERAL, ), peripheral)
+	count = ccall((:simpleble_peripheral_services_count, simplecble), Csize_t, (SBLEPERIPHERAL, ), peripheral)
 	services = SBLESERVICE[]
 	for i in 0:count-1
 		ret = Ref{SBLESERVICE}()
-		err = ccall((:simpleble_peripheral_services_get, :simplecble), SBLEERROR, (SBLEPERIPHERAL, Csize_t, Ptr{SBLESERVICE}), peripheral, i, ret)
+		err = ccall((:simpleble_peripheral_services_get, simplecble), SBLEERROR, (SBLEPERIPHERAL, Csize_t, Ptr{SBLESERVICE}), peripheral, i, ret)
 		if err == SBLESUCCESS
 			push!(services, ret[])
 		end
@@ -104,11 +104,11 @@ function services(peripheral::Peripheral)
 end
 
 function manufacturer_data(peripheral::Peripheral)
-	count = ccall((:simpleble_peripheral_manufacturer_data_count, :simplecble), Csize_t, (SBLEPERIPHERAL, ), peripheral)
+	count = ccall((:simpleble_peripheral_manufacturer_data_count, simplecble), Csize_t, (SBLEPERIPHERAL, ), peripheral)
 	manufacturer_data = SBLEMANUFACTURERDATA[]
 	for i in 0:count-1
 		ret = Ref{SBLEMANUFACTURERDATA}()
-		err = ccall((:simpleble_peripheral_manufacturer_data_get, :simplecble), SBLEERROR, (SBLEPERIPHERAL, Csize_t, Ptr{SBLEMANUFACTURERDATA}), peripheral, i, ret)
+		err = ccall((:simpleble_peripheral_manufacturer_data_get, simplecble), SBLEERROR, (SBLEPERIPHERAL, Csize_t, Ptr{SBLEMANUFACTURERDATA}), peripheral, i, ret)
 		if err == SBLESUCCESS
 			push!(manufacturer_data, ret[])
 		end
@@ -127,7 +127,7 @@ end
 function peripheral_read(peripheral::Peripheral, s::SBLEUUID, c::SBLEUUID)
 	data_ptr = Ref{Ptr{UInt8}}()
 	data_length = Ref{Csize_t}()
-	err = ccall((:simpleble_peripheral_read, :simplecble), SBLEERROR, (SBLEPERIPHERAL, SBLEUUID, SBLEUUID, Ptr{Ptr{UInt8}}, Ptr{Csize_t}), peripheral, s, c, data_ptr, data_length)
+	err = ccall((:simpleble_peripheral_read, simplecble), SBLEERROR, (SBLEPERIPHERAL, SBLEUUID, SBLEUUID, Ptr{Ptr{UInt8}}, Ptr{Csize_t}), peripheral, s, c, data_ptr, data_length)
 	if err == SBLEFAILURE
 		@error "Failed to read peripheral"
 		return nothing
@@ -150,7 +150,7 @@ function write_request(peripheral::Peripheral, s::SBLEUUID, c::SBLEUUID, data)
 	if typeof(data) <: AbstractString
 		data = codeunits(data)
 	end
-	err = ccall((:simpleble_peripheral_write_request, :simplecble), SBLEERROR, (SBLEPERIPHERAL, SBLEUUID, SBLEUUID, Ptr{UInt8}), peripheral, s, c, data)
+	err = ccall((:simpleble_peripheral_write_request, simplecble), SBLEERROR, (SBLEPERIPHERAL, SBLEUUID, SBLEUUID, Ptr{UInt8}), peripheral, s, c, data)
 	err == SBLEFAILURE && @error "Failed to write request"
 	return err == SBLESUCCESS
 end
@@ -167,7 +167,7 @@ function write_command(peripheral::Peripheral, s::SBLEUUID, c::SBLEUUID, data)
 	if typeof(data) <: AbstractString
 		data = codeunits(data)
 	end
-	err = ccall((:simpleble_peripheral_write_command, :simplecble), SBLEERROR, (SBLEPERIPHERAL, SBLEUUID, SBLEUUID, Ptr{UInt8}), peripheral, s, c, data)
+	err = ccall((:simpleble_peripheral_write_command, simplecble), SBLEERROR, (SBLEPERIPHERAL, SBLEUUID, SBLEUUID, Ptr{UInt8}), peripheral, s, c, data)
 	return err == SBLESUCCESS
 end
 
@@ -188,7 +188,7 @@ function Base.notify(callback, peripheral::Peripheral, s::SBLEUUID, c::SBLEUUID)
 	end
 	c_callback = @cfunction($adjcallback, Cvoid, (SBLEPERIPHERAL, SBLEUUID, SBLEUUID, Ptr{UInt8}, Csize_t, Ptr{Cvoid}))
 	push!(active_callbacks, c_callback)
-	err= ccall((:simpleble_peripheral_notify, :simplecble), SBLEERROR, (SBLEPERIPHERAL, SBLEUUID, SBLEUUID, Ptr{Cvoid}, Ptr{Cvoid}), peripheral, s, c, c_callback, C_NULL)
+	err= ccall((:simpleble_peripheral_notify, simplecble), SBLEERROR, (SBLEPERIPHERAL, SBLEUUID, SBLEUUID, Ptr{Cvoid}, Ptr{Cvoid}), peripheral, s, c, c_callback, C_NULL)
 	if err == SBLEFAILURE
 		@error "Failed to subscribe to notification"
 		return nothing
@@ -214,7 +214,7 @@ function indicate(callback, peripheral::Peripheral, s::SBLEUUID, c::SBLEUUID)
 	end
 	c_callback = @cfunction($adjcallback, Cvoid, (SBLEPERIPHERAL, SBLEUUID, SBLEUUID, Ptr{UInt8}, Csize_t, Ptr{Cvoid}))
 	push!(active_callbacks, c_callback)
-	err= ccall((:simpleble_peripheral_indicate, :simplecble), SBLEERROR, (SBLEPERIPHERAL, SBLEUUID, SBLEUUID, Ptr{Cvoid}, Ptr{Cvoid}), peripheral, s, c, c_callback, C_NULL)
+	err= ccall((:simpleble_peripheral_indicate, simplecble), SBLEERROR, (SBLEPERIPHERAL, SBLEUUID, SBLEUUID, Ptr{Cvoid}, Ptr{Cvoid}), peripheral, s, c, c_callback, C_NULL)
 	if err == SBLEFAILURE
 		@error "Failed to subscribe to notification"
 		return nothing
@@ -232,7 +232,7 @@ function unsubscribe(peripheral::Peripheral, s::SBLESERVICE, c::SBLECHARACTERIST
 	unsubscribe(peripheral, s.uuid, c.uuid)
 end
 function unsubscribe(peripheral::Peripheral, s::SBLEUUID, c::SBLEUUID)
-	err = ccall((:simpleble_peripheral_unsubscribe, :simplecble), SBLEERROR, (SBLEPERIPHERAL, SBLEUUID, SBLEUUID), peripheral, s, c)
+	err = ccall((:simpleble_peripheral_unsubscribe, simplecble), SBLEERROR, (SBLEPERIPHERAL, SBLEUUID, SBLEUUID), peripheral, s, c)
 	if err == SBLEFAILURE
 		@error "Failed to subscribe to notification"
 		return nothing
@@ -253,7 +253,7 @@ end
 function read_descriptor(peripheral::Peripheral, s::SBLEUUID, c::SBLEUUID, d::SBLEUUID)
 	data_ptr = Ref{Ptr{UInt8}}()
 	data_length = Ref{Csize_t}()
-	err = ccall((:simpleble_peripheral_read_descriptor, :simplecble), SBLEERROR, (SBLEPERIPHERAL, SBLEUUID, SBLEUUID, SBLEUUID, Ptr{Ptr{UInt8}}, Ptr{Csize_t}), peripheral, s, c, d, data_ptr, data_length)
+	err = ccall((:simpleble_peripheral_read_descriptor, simplecble), SBLEERROR, (SBLEPERIPHERAL, SBLEUUID, SBLEUUID, SBLEUUID, Ptr{Ptr{UInt8}}, Ptr{Csize_t}), peripheral, s, c, d, data_ptr, data_length)
 	if err == SBLEFAILURE
 		@error "Failed to read peripheral"
 		return nothing
@@ -274,7 +274,7 @@ function write_descriptor(peripheral::Peripheral, s::SBLEUUID, c::SBLEUUID, d::S
 	if typeof(data) <: AbstractString
 		data = codeunits(data)
 	end
-	err = ccall((:simpleble_peripheral_write_descriptor, :simplecble), SBLEERROR, (SBLEPERIPHERAL, SBLEUUID, SBLEUUID, SBLEUUID, Ptr{UInt8}), peripheral, s, c, d, data)
+	err = ccall((:simpleble_peripheral_write_descriptor, simplecble), SBLEERROR, (SBLEPERIPHERAL, SBLEUUID, SBLEUUID, SBLEUUID, Ptr{UInt8}), peripheral, s, c, d, data)
 	return err == SBLESUCCESS
 end
 
@@ -285,7 +285,7 @@ function set_callback_on_connected(callback, peripheral::Peripheral)
 	end
 	c_callback = @cfunction($adjcallback, Cvoid, (SBLEPERIPHERAL, Ptr{Cvoid}))
 	push!(active_callbacks, c_callback)
-	err = ccall((:simpleble_peripheral_set_callback_on_connected, :simplecble), SBLEERROR, (SBLEPERIPHERAL, Ptr{Cvoid}, Ptr{Cvoid}), peripheral, c_callback, C_NULL)
+	err = ccall((:simpleble_peripheral_set_callback_on_connected, simplecble), SBLEERROR, (SBLEPERIPHERAL, Ptr{Cvoid}, Ptr{Cvoid}), peripheral, c_callback, C_NULL)
 	err != SBLESUCCESS && @error "Assigning callback failed"
 	return nothing
 end
@@ -297,10 +297,10 @@ function set_callback_on_disconnected(callback, peripheral::Peripheral)
 	end
 	c_callback = @cfunction($adjcallback, Cvoid, (SBLEPERIPHERAL, Ptr{Cvoid}))
 	push!(active_callbacks, c_callback)
-	err = ccall((:simpleble_peripheral_set_callback_on_disconnected, :simplecble), SBLEERROR, (SBLEPERIPHERAL, Ptr{Cvoid}, Ptr{Cvoid}), peripheral, c_callback, C_NULL)
+	err = ccall((:simpleble_peripheral_set_callback_on_disconnected, simplecble), SBLEERROR, (SBLEPERIPHERAL, Ptr{Cvoid}, Ptr{Cvoid}), peripheral, c_callback, C_NULL)
 	err != SBLESUCCESS && @error "Assigning callback failed"
 	return nothing
 end
 
 ### The following are internal and not sanitized for users
-simpleble_peripheral_underlying(handle) = ccall((:simpleble_peripheral_underlying, :simplecble), Ptr{Cvoid}, (SBLEPERIPHERAL, ), handle)
+simpleble_peripheral_underlying(handle) = ccall((:simpleble_peripheral_underlying, simplecble), Ptr{Cvoid}, (SBLEPERIPHERAL, ), handle)
