@@ -3,8 +3,13 @@ export find_peripheral,
 
 
 """
+	find_peripheral(matchfunc, adapter)
+	find_peripheral(adapter) do identifier::String
+		# Stuff
+		return output::Bool
+	end
 Convenience function for finding a peripheral.
-matchfunc must take one string argument and return a bool
+`identifier` is the name of the peripheral, it can be an empty string.
 """
 function find_peripheral(matchfunc, adapter)
 	adapterid = identifier(adapter)
@@ -31,11 +36,40 @@ function find_peripheral(matchfunc, adapter)
 	sleep(1)
 	close(perich)
 
+	# Clean up
+	ccall(
+		(:simpleble_adapter_set_callback_on_scan_start, simplecble),
+		SBLEERROR,
+		(SBLEADAPTER, Ptr{Cvoid}),
+		adapter, C_NULL
+	)
+	ccall(
+		(:simpleble_adapter_set_callback_on_scan_stop, simplecble),
+		SBLEERROR,
+		(SBLEADAPTER, Ptr{Cvoid}),
+		adapter, C_NULL
+	)
+	ccall(
+		(:simpleble_adapter_set_callback_on_scan_found, simplecble),
+		SBLEERROR,
+		(SBLEADAPTER, Ptr{Cvoid}),
+		adapter, C_NULL
+	)
+	ccall(
+		(:simpleble_adapter_set_callback_on_scan_updated, simplecble),
+		SBLEERROR,
+		(SBLEADAPTER, Ptr{Cvoid}),
+		adapter, C_NULL
+	)
+
 	return peri
 end
 
 """
-Convenience function for automatically disconnecting from a 
+	connect(peripheral) do
+		# Stuff
+	end
+Convenience function for automatically disconnecting from a
 peripheral once you're done with it
 """
 function connect(func, peripheral::Peripheral)
