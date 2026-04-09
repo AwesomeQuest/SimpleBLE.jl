@@ -291,7 +291,7 @@ Write a request to a characteristic.
 See also [`write_command`](@ref)
 """
 function write_request(peripheral::Peripheral,
-	s::SBLEUUID, c::SBLEUUID, data::A) where A <: AbstractArray
+	s::SBLEUUID, c::SBLEUUID, data::Union{A, S}) where {A <: AbstractArray, S <: AbstractString}
 	if typeof(data) <: AbstractString
 		data = codeunits(data)
 	end
