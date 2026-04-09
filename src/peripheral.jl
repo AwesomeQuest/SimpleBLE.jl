@@ -1,5 +1,9 @@
 export identifier,
 	address,
+	address_type,
+	rssi,
+	tx_power,
+	mtu,
 	connect,
 	disconnect,
 	is_connected,
@@ -61,6 +65,7 @@ function address(peripheral::Peripheral)
 	end
 end
 
+"`address_type(peripheral)`"
 const address_type(peripheral::Peripheral) = ccall(
 	(:simpleble_peripheral_address_type, simplecble),
 	SBLEADDRESSTYPE,
@@ -68,21 +73,24 @@ const address_type(peripheral::Peripheral) = ccall(
 	peripheral
 )
 
-const peripheral_rssi(peripheral::Peripheral) = ccall(
+"`rssi(peripheral)`"
+const rssi(peripheral::Peripheral) = ccall(
 	(:simpleble_peripheral_rssi, simplecble),
 	UInt16,
 	(SBLEPERIPHERAL, ),
 	peripheral
 )
 
-const peripheral_tx_power(peripheral::Peripheral) = ccall(
+"`tx_power(peripheral)`"
+const tx_power(peripheral::Peripheral) = ccall(
 	(:simpleble_peripheral_tx_power, simplecble),
 	UInt16,
 	(SBLEPERIPHERAL, ),
 	peripheral
 )
 
-const peripheral_mtu(peripheral::Peripheral) = ccall(
+"`mtu(peripheral)`"
+const mtu(peripheral::Peripheral) = ccall(
 	(:simpleble_peripheral_mtu, simplecble),
 	UInt16,
 	(SBLEPERIPHERAL, ),
@@ -104,6 +112,7 @@ function connect(peripheral::Peripheral)
 	return err == SBLESUCCESS
 end
 
+"	disconnect(peripheral)"
 function disconnect(peripheral::Peripheral)
 	err = ccall(
 		(:simpleble_peripheral_disconnect, simplecble),
@@ -114,6 +123,7 @@ function disconnect(peripheral::Peripheral)
 	return err == SBLESUCCESS
 end
 
+"	is_connected(peripheral)"
 function is_connected(peripheral::Peripheral)
 	ret = Ref{Bool}()
 	err = ccall(
@@ -129,6 +139,7 @@ function is_connected(peripheral::Peripheral)
 	return ret[]
 end
 
+"	is_connectable(peripheral)"
 function is_connectable(peripheral::Peripheral)
 	ret = Ref{Bool}()
 	err = ccall(
@@ -144,6 +155,7 @@ function is_connectable(peripheral::Peripheral)
 	return ret[]
 end
 
+"	is_paired(peripheral)"
 function is_paired(peripheral::Peripheral)
 	ret = Ref{Bool}()
 	err = ccall(
@@ -159,6 +171,7 @@ function is_paired(peripheral::Peripheral)
 	return ret[]
 end
 
+"	unpair(peripheral)"
 const unpair(peripheral::Peripheral) = ccall(
 	(:simpleble_peripheral_unpair, simplecble),
 	SBLEERROR, (SBLEPERIPHERAL, ), peripheral
@@ -229,7 +242,10 @@ function peripheral_read(peripheral::Peripheral,
 end
 
 """
-	peripheral_read(peripheral, service, characteristic)
+	peripheral_read(peripheral, 
+		service::Union{AbstractString, SBLEUUID, SBLESERVICE},
+		characteristic::Union{AbstractString, SBLEUUID, SBLECHARACTERISTIC},
+	)
 Read data from a characteristic.
 
 `service` and `characteristic` can be `AbstractString`s, `SBLEUUID`s, or
@@ -268,9 +284,11 @@ end
 	write_request(peripheral,
 		service::Union{AbstractString, SBLEUUID, SBLESERVICE},
 		characteristic::Union{AbstractString, SBLEUUID, SBLECHARACTERISTIC},
-		data<:AbstractArray
+		data <: AbstractArray
 	)
 Write a request to a characteristic.
+
+See also [`write_command`](@ref)
 """
 function write_request(peripheral::Peripheral,
 	s::SBLEUUID, c::SBLEUUID, data::A) where A <: AbstractArray
@@ -304,9 +322,11 @@ end
 		peripheral,
 		service::Union{AbstractString, SBLEUUID, SBLESERVICE},
 		characteristic::Union{AbstractString, SBLEUUID, SBLECHARACTERISTIC},
-		data<: AbstractArray
+		data <: AbstractArray
 	)
 Write a command to a characteristic.
+
+See also [`write_request`](@ref)
 """
 function write_command(peripheral::Peripheral, s::SBLEUUID, c::SBLEUUID, data)
 	if typeof(data) <: AbstractString
@@ -350,6 +370,8 @@ end
 Set a callback that is called when data is received from a Characteristic.
 `notify` is generally faster than `indicate` because it does not need to
 acknowledge that it received the data.
+
+See also [`indicate`](@ref)
 
 !!! warning 
 	WARNING: YOU MUST NOT PASS THE `data` VECTOR OUTSIDE THE CALLBACK,
@@ -410,6 +432,8 @@ Set a callback that is called when data is received from a Characteristic.
 `notify` is generally faster than `indicate` because it does not need to
 acknowledge that it received the data.
 
+See also [`notify`](@ref)
+
 !!! warning 
 	WARNING: YOU MUST NOT PASS THE `data` VECTOR OUTSIDE THE CALLBACK,
 	IT IS NOT VALID AFTER THE CALLBACK FINISHES, IF YOU NEED TO KEEP THE DATA
@@ -456,7 +480,7 @@ end
 		service::Union{AbstractString, SBLEUUID, SBLESERVICE},
 		characteristic::Union{AbstractString, SBLEUUID, SBLECHARACTERISTIC}
 	)
-unsubscribe from a `notify` or `indicate` call.
+unsubscribe from a [`notify`](@ref) or [`indicate`](@ref) call.
 """
 function unsubscribe(peripheral::Peripheral, s::SBLEUUID, c::SBLEUUID)
 	err = ccall(
@@ -576,6 +600,7 @@ function set_callback_on_connected(callback, peripheral::Peripheral)
 end
 
 """
+	set_callback_on_disconnected(callback, peripheral)
 	set_callback_on_disconnected(peripheral) do
 		# Stuff
 	end
@@ -601,6 +626,7 @@ function set_callback_on_disconnected(callback, peripheral::Peripheral)
 end
 
 ### The following are internal and not sanitized for users
+"`simpleble_peripheral_underlying(handle)`"
 simpleble_peripheral_underlying(handle) = ccall(
 	(:simpleble_peripheral_underlying, simplecble),
 	Ptr{Cvoid},

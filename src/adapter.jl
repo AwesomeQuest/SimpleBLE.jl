@@ -1,8 +1,12 @@
 export is_bluetooth_enabled,
-	adapter_get_count,
+	adapters_get_count,
 	get_adapter,
+	get_adapters,
 	identifier,
 	address,
+	power_on,
+	power_off,
+	is_powered,
 	set_callback_on_power_on,
 	set_callback_on_power_off,
 	scan_start,
@@ -20,13 +24,15 @@ export is_bluetooth_enabled,
 
 ### The following are public function intended for users
 
+"Check if system bluetooth is enabled"
 const is_bluetooth_enabled() = ccall(
 	(:simpleble_adapter_is_bluetooth_enabled, simplecble),
 	Bool,
 	()
 )
 
-const adapter_get_count() = ccall(
+"Get number of adapters in system"
+const adapters_get_count() = ccall(
 	(:simpleble_adapter_get_count, simplecble),
 	Csize_t,
 	()
@@ -35,7 +41,7 @@ const adapter_get_count() = ccall(
 """
 	get_adapter(i)
 Acquire a handle to an adapter. `i` is an index starting at 0.
-You can check the number of adapters with `adapter_get_count`.
+You can check the number of adapters with [`adapters_get_count`](@ref).
 """
 function get_adapter(i)
 	adapter = ccall(
@@ -49,9 +55,19 @@ function get_adapter(i)
 	return A
 end
 
+"Get a Vector of adapters"
+function get_adapters()
+	adapters = Adapter[]
+	for i in 0:adapters_get_count()-1
+		A = get_adapter(i)
+		push!(adapters, A)
+	end
+	return adapters
+end
+
 """
 	identifier(adapter)
-Get the name of an adapter.
+Get the name of an `adapter`.
 
 See also [`address`](@ref)
 """
@@ -70,7 +86,7 @@ end
 
 """
 	address(adapter)
-Get the address of an adapter.
+Get the address of an `adapter`.
 
 See also [`identifier`](@ref)
 """
@@ -87,6 +103,12 @@ function address(adapter::Adapter)
 	end
 end
 
+"""
+	power_on(adapter)
+Power on an `adapter`
+
+See also [`power_off`](@ref), [`is_powered`](@ref)
+"""
 function power_on(adapter::Adapter)
 	err = ccall(
 		(:simpleble_adapter_power_on, simplecble),
@@ -97,6 +119,12 @@ function power_on(adapter::Adapter)
 	return err == SBLESUCCESS
 end
 
+"""
+	power_off(adapter)
+Power on an `adapter`
+
+See also [`power_on`](@ref), [`is_powered`](@ref)
+"""
 function power_off(adapter::Adapter)
 	err = ccall(
 		(:simpleble_adapter_power_off, simplecble),
@@ -107,6 +135,12 @@ function power_off(adapter::Adapter)
 	return err == SBLESUCCESS
 end
 
+"""
+	is_powered(adapter)
+Check if `adapter` is powered
+
+See also [`power_on`](@ref), [`power_off`](@ref)
+"""
 function is_powered(adapter::Adapter)
 	ret = Ref{Bool}()
 	err = ccall(
@@ -122,6 +156,7 @@ function is_powered(adapter::Adapter)
 end
 
 """
+	set_callback_on_power_on(callback, adapter)
 	set_callback_on_power_on(adapter) do
 		# Stuff
 	end
@@ -145,6 +180,7 @@ function set_callback_on_power_on(callback, adapter::Adapter)
 end
 
 """
+	set_callback_on_power_off(callback, adapter)
 	set_callback_on_power_off(adapter) do
 		# Stuff
 	end
@@ -186,7 +222,7 @@ function scan_start(adapter::Adapter)
 	return nothing
 end
 
-"Stop a scan"
+"	scan_stop(adapter)\nStop a scan"
 function scan_stop(adapter::Adapter)
 	err = ccall(
 		(:simpleble_adapter_scan_stop, simplecble),
@@ -198,6 +234,7 @@ function scan_stop(adapter::Adapter)
 	return nothing
 end
 
+"	scan_is_active(adapter)\nCheck if adapter is scanning"
 function scan_is_active(adapter::Adapter)
 	ret = Ref{Bool}()
 	err = ccall(
@@ -259,6 +296,7 @@ function scan_get_results(adapter::Adapter)
 	return peris
 end
 
+"	get_paired_peripherals(adapter)\nGet list of peripherals paired with `adapter`"
 function get_paired_peripherals(adapter::Adapter)
 	peris = Peripheral[]
 	count = ccall(
@@ -280,6 +318,10 @@ function get_paired_peripherals(adapter::Adapter)
 	return peris
 end
 
+"""
+	get_connected_peripherals(adapter)
+Get a vector of connected peripherals.
+"""
 function get_connected_peripherals(adapter::Adapter)
 	peris = Peripheral[]
 	count = ccall(
@@ -302,6 +344,7 @@ function get_connected_peripherals(adapter::Adapter)
 end
 
 """
+	set_callback_on_scan_start(callback, adapter)
 	set_callback_on_scan_start(adapter) do
 		# Stuff
 	end
@@ -327,6 +370,7 @@ function set_callback_on_scan_start(callback, adapter::Adapter)
 end
 
 """
+	set_callback_on_scan_stop(callback, adapter)
 	set_callback_on_scan_stop(adapter) do
 		# Stuff
 	end
@@ -351,6 +395,7 @@ function set_callback_on_scan_stop(callback, adapter::Adapter)
 end
 
 """
+	set_callback_on_scan_found(callback, adapter)
 	set_callback_on_scan_found(adapter) do peripheral
 		# Stuff
 	end
@@ -377,6 +422,7 @@ function set_callback_on_scan_found(callback, adapter::Adapter)
 end
 
 """
+	set_callback_on_scan_updated(callback, adapter)
 	set_callback_on_scan_updated(adapter) do peripheral
 		# Stuff
 	end
@@ -405,6 +451,7 @@ end
 
 ### The following are internal and not sanitized for users
 
+"`simpleble_adapter_underlying(handle)`"
 simpleble_adapter_underlying(handle) = ccall(
 	(:simpleble_adapter_underlying, simplecble),
 	Ptr{Cvoid},

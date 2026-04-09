@@ -1,3 +1,7 @@
+export Adapter,
+	Peripheral,
+	SBLEUUID
+
 import Base
 
 ### The following are internal types not intended for users

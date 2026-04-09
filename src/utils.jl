@@ -66,6 +66,7 @@ function find_peripheral(matchfunc, adapter)
 end
 
 """
+	connect(callback, peripheral)
 	connect(peripheral) do
 		# Stuff
 	end
@@ -73,7 +74,7 @@ Convenience function for automatically disconnecting from a
 peripheral once you're done with it
 """
 function connect(func, peripheral::Peripheral)
-	connect(peripheral)
+	connect(peripheral) || return false
 	try
 		func()
 	catch e
@@ -81,4 +82,5 @@ function connect(func, peripheral::Peripheral)
 	finally
 		disconnect(peripheral)
 	end
+	return true
 end

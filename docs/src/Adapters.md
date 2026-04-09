@@ -1,0 +1,26 @@
+# Adapters
+
+```@docs
+is_bluetooth_enabled
+adapters_get_count
+get_adapter
+get_adapters
+identifier
+address
+power_on
+power_off
+is_powered
+set_callback_on_power_on
+set_callback_on_power_off
+scan_start
+scan_stop
+scan_is_active
+scan_for
+scan_get_results
+get_paired_peripherals
+get_connected_peripherals
+set_callback_on_scan_start
+set_callback_on_scan_stop
+set_callback_on_scan_found
+set_callback_on_scan_updated
+```

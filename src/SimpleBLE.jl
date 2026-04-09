@@ -6,7 +6,7 @@ using SimpleBLE_jll
 active_callbacks = Base.CFunction[]
 
 
-
+"Free memory given by simplecble"
 free(x) = ccall(
 	(:simpleble_free, simplecble),
 	Cvoid,
@@ -21,12 +21,14 @@ include("peripheral.jl")
 include("logging.jl")
 include("utils.jl")
 
+"Get current operating system"
 simpleble_get_operating_system() = ccall(
 	(:simpleble_get_operating_system, simplecble),
 	SBLEOS,
 	()
 )
 
+"Get the version of SimpleBLE"
 function simpleble_get_version()
 	c_str = ccall(
 		(:simpleble_get_version, simplecble),
