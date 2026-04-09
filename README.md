@@ -22,7 +22,9 @@ Bluetooth is a hierarchy
 
 # Usage example
 ```julia
-
+# You generally need to know the UUIDs of things in advance
+# since they don't have names, but you can query a peripheral
+# about its properties with `services`
 const SERVICE_UUID					= "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
 const CHARACTERISTIC_UUID_TX		= "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 const CHARACTERISTIC_UUID_RX		= "6d68ef76-79f6-4b8a-bf9d-05fc906b8290"
@@ -36,15 +38,6 @@ peri = find_peripheral(adapter) do id
 	occursin("SiNW", id)
 end
 connect(peri) do
-	# You generally need to know the UUIDs of things in advance
-	# since they don't have names, but you can query a peripheral
-	# about its properties with `peripheral_services_get`
-	SERVICE_UUID				= "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
-	CHARACTERISTIC_UUID_TX		= "beb5483e-36e1-4688-b7f5-ea07361b26a8"
-	CHARACTERISTIC_UUID_RX		= "6d68ef76-79f6-4b8a-bf9d-05fc906b8290"
-	CHARACTERISTIC_UUID_CONFIG	= "3c3d5e6f-7a8b-4c9d-9e0f-1a2b3c4d5e6f"
-
-
 	@info "Writing Commands"
 	write_request(peri, SERVICE_UUID, CHARACTERISTIC_UUID_RX, JSON.json("cmd" => "start"))
 	write_request(peri, SERVICE_UUID, CHARACTERISTIC_UUID_RX, JSON.json(Dict("cmd"=>"set_rate", "rate"=>samplerate)))
