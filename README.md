@@ -1,3 +1,6 @@
+
+[![](https://img.shields.io/badge/docs-stable-blue.svg)]([https://cstook.github.io/LTspice.jl/stable](https://awesomequest.github.io/SimpleBLE.jl/index.html))
+
 # SimpleBLE.jl
 A Julia wrapper for interfacing with the [SimpleBLE](https://github.com/simpleble/simpleble.git) bluetooth C library.
 
