@@ -71,4 +71,4 @@ end
 
 
 [docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
-[docs-stable-url]: https://documenter.juliadocs.org/stable
+[docs-stable-url]: https://awesomequest.github.io/SimpleBLE.jl/index.html
