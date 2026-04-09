@@ -1,5 +1,6 @@
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+DocumenterTools = "35a29f4d-8980-5a13-9543-d66fff28ecb8"
 DocumenterTypst = "d7fd56dd-41bc-4b2d-b658-79a5840b2e09"
 SimpleBLE = "c43e3543-e659-46d0-a341-79c7b8740d4a"
 
