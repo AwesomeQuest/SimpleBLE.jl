@@ -227,6 +227,7 @@ function peripheral_read(peripheral::Peripheral,
 	s::SBLESERVICE, c::SBLECHARACTERISTIC)
 	peripheral_read(peripheral, s.uuid, c.uuid)
 end
+
 """
 	peripheral_read(peripheral, service, characteristic)
 Read data from a characteristic.
@@ -262,6 +263,7 @@ function write_request(peripheral::Peripheral,
 	s::SBLESERVICE, c::SBLECHARACTERISTIC, data)
 	write_request(peripheral, s.uuid, c.uuid, data)
 end
+
 """
 	write_request(peripheral,
 		service::Union{AbstractString, SBLEUUID, SBLESERVICE},
@@ -296,6 +298,7 @@ function write_command(peripheral::Peripheral,
 	s::SBLESERVICE, c::SBLECHARACTERISTIC, data)
 	write_command(peripheral, s.uuid, c.uuid, data)
 end
+
 """
 	write_command(
 		peripheral,
@@ -330,6 +333,7 @@ function Base.notify(callback, peripheral::Peripheral,
 	s::SBLESERVICE, c::SBLECHARACTERISTIC)
 	Base.notify(callback, peripheral, s.uuid, c.uuid)
 end
+
 """
 	notify(callback,
 		peripheral::Peripheral,
@@ -346,9 +350,11 @@ end
 Set a callback that is called when data is received from a Characteristic.
 `notify` is generally faster than `indicate` because it does not need to
 acknowledge that it received the data.
-WARNING: YOU MUST NOT PASS THE `data` VECTOR OUTSIDE THE CALLBACK,
-IT IS NOT VALID AFTER THE CALLBACK FINISHES, IF YOU NEED TO KEEP THE DATA
-AFTER THE CALLBACK IS FINISHED, COPY IT!
+
+!!! warning 
+	WARNING: YOU MUST NOT PASS THE `data` VECTOR OUTSIDE THE CALLBACK,
+	IT IS NOT VALID AFTER THE CALLBACK FINISHES, IF YOU NEED TO KEEP THE DATA
+	AFTER THE CALLBACK IS FINISHED, COPY IT!
 """
 function Base.notify(callback, peripheral::Peripheral, s::SBLEUUID, c::SBLEUUID)
 	function adjcallback(peripheral, service, characteristic, data, data_length, userdata)
@@ -386,6 +392,7 @@ function indicate(callback, peripheral::Peripheral,
 	s::SBLESERVICE, c::SBLECHARACTERISTIC)
 	indicate(callback, peripheral, s.uuid, c.uuid)
 end
+
 """
 	indicate(callback,
 		peripheral::Peripheral,
@@ -402,9 +409,11 @@ end
 Set a callback that is called when data is received from a Characteristic.
 `notify` is generally faster than `indicate` because it does not need to
 acknowledge that it received the data.
-WARNING: YOU MUST NOT PASS THE `data` VECTOR OUTSIDE THE CALLBACK,
-IT IS NOT VALID AFTER THE CALLBACK FINISHES, IF YOU NEED TO KEEP THE DATA
-AFTER THE CALLBACK IS FINISHED, COPY IT!
+
+!!! warning 
+	WARNING: YOU MUST NOT PASS THE `data` VECTOR OUTSIDE THE CALLBACK,
+	IT IS NOT VALID AFTER THE CALLBACK FINISHES, IF YOU NEED TO KEEP THE DATA
+	AFTER THE CALLBACK IS FINISHED, COPY IT!
 """
 function indicate(callback, peripheral::Peripheral, s::SBLEUUID, c::SBLEUUID)
 	function adjcallback(peripheral, service, characteristic, data, data_length, userdata)
@@ -440,6 +449,7 @@ end
 function unsubscribe(peripheral::Peripheral, s::SBLESERVICE, c::SBLECHARACTERISTIC)
 	unsubscribe(peripheral, s.uuid, c.uuid)
 end
+
 """
 	unsubscribe(
 		peripheral,
@@ -474,6 +484,7 @@ function read_descriptor(peripheral::Peripheral,
 	s::SBLESERVICE, c::SBLECHARACTERISTIC, d::SBLEDESCRIPTOR)
 	read_descriptor(peripheral, s.uuid, c.uuid, d.uuid)
 end
+
 """
 	read_descriptor(
 		peripheral,
@@ -511,6 +522,7 @@ function write_descriptor(peripheral::Peripheral,
 	s::SBLESERVICE, c::SBLECHARACTERISTIC, d::SBLEDESCRIPTOR, data)
 	write_descriptor(peripheral, s.uuid, c.uuid, d.uuid, data)
 end
+
 """
 	write_descriptor(
 		peripheral,
@@ -537,10 +549,14 @@ function write_descriptor(peripheral::Peripheral,
 end
 
 """
+	set_callback_on_connected(callback, peripheral)
 	set_callback_on_connected(peripheral) do
 		# Stuff
 	end
+
 Set a callback that is called when a peripheral is connected.
+
+See also [`set_callback_on_disconnected`](@ref)
 """
 function set_callback_on_connected(callback, peripheral::Peripheral)
 	function adjcallback(peripheral, userdata)
@@ -564,6 +580,8 @@ end
 		# Stuff
 	end
 Set a callback that is called when a peripheral is disconnected.
+
+See also [`set_callback_on_connected`](@ref)
 """
 function set_callback_on_disconnected(callback, peripheral::Peripheral)
 	function adjcallback(peripheral, userdata)

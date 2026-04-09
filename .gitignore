@@ -1,5 +1,2 @@
-/temp/*
-/temp2/*
-/temp3/*
-testccall.jl
 .vscode/settings.json
+docs/build_typst/*

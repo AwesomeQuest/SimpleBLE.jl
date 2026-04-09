@@ -186,6 +186,7 @@ function scan_start(adapter::Adapter)
 	return nothing
 end
 
+"Stop a scan"
 function scan_stop(adapter::Adapter)
 	err = ccall(
 		(:simpleble_adapter_scan_stop, simplecble),
