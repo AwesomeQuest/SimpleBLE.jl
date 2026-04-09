@@ -7,8 +7,11 @@
 A Julia wrapper for interfacing with the [SimpleBLE](https://github.com/simpleble/simpleble.git) bluetooth C library.
 
 ## Installation
-Enter Pkg mode by typing ] in the REPL
+Currently SimpleBLE.jl is not registered so you'll need to first install the binary wrapper [SimpleBLE_jll](https://github.com/AwesomeQuest/SimpleBLE_jll.git) and then this library
+
+Enter Pkg mode in Julia by typing ] in the REPL
 ```juliarepl
+ pkg> add https://github.com/AwesomeQuest/SimpleBLE_jll.git
  pkg> add https://github.com/AwesomeQuest/SimpleBLE.jl.git
 ```
 
