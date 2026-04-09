@@ -1,9 +1,6 @@
 # SimpleBLE.jl
 A Julia wrapper for interfacing with the [SimpleBLE](https://github.com/simpleble/simpleble.git) bluetooth C library.
 
-Currently I just include a precompiled dll inside the shared directory because I can't figure out how to compile SimpleBLE with BinaryBuilder.jl. 
-Only for windows a.t.m. but if anyone want's to test it with a linux .so send an issue and I'll add it (assuming we don't figure out BinaryBuilder.jl).
-
 ## Installation
 Enter Pkg mode by typing ] in the REPL
 ```juliarepl
