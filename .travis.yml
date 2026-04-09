@@ -1,8 +1,8 @@
-language: generic
-
-script:
-  - echo "Running tests"
-  - # Add your build and test commands here
+language: julia
+os:
+  - linux
+julia:
+  - 1
 
 notifications:
   email: true
