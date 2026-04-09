@@ -1,5 +1,7 @@
 
-[![](https://img.shields.io/badge/docs-stable-blue.svg)]([https://cstook.github.io/LTspice.jl/stable](https://awesomequest.github.io/SimpleBLE.jl/index.html))
+| **Documentation**   |
+|:-------------------:|
+| [![][docs-stable-img]][docs-stable-url] |
 
 # SimpleBLE.jl
 A Julia wrapper for interfacing with the [SimpleBLE](https://github.com/simpleble/simpleble.git) bluetooth C library.
@@ -65,3 +67,8 @@ connect(peri) do
 	close(f)
 end
 ```
+
+
+
+[docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
+[docs-stable-url]: https://documenter.juliadocs.org/stable
