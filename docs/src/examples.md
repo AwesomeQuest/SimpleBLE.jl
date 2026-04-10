@@ -7,10 +7,8 @@ The following examples are recreations from [here](https://github.com/simpleble/
 adapter = get_adapter(0)
 peripherals = Peripheral[]
 set_callback_on_scan_found(adapter) do peri
-	println("Found device: ", identifier(peri), "[",address(peri),"]")
-	if is_connectable(peri)
-		push!(peripherals, peri)
-	end
+	println("Found device: ", identifier(peri), " [",address(peri),"]")
+	is_connectable(peri) && push!(peripherals, peri)
 end
 set_callback_on_scan_start(()->println("Scan started"), adapter)
 set_callback_on_scan_stop(()->println("Scan stopped"), adapter)
@@ -21,9 +19,9 @@ for (i,p) in enumerate(peripherals)
 	println("[$i] ", identifier(p), " [$(address(p))]")
 end
 
-print("Please select a device to connect to")
+print("Please select a device to connect to: ")
 selection = parse(Int, readline())
-selection in eachindex(peripherals) || exit(1)
+selection in eachindex(peripherals) || error("Incorrect selection")
 
 peri = peripherals[selection]
 println("Connecting to ", identifier(peri), " [",address(peri),"]")
@@ -55,10 +53,8 @@ end
 adapter = get_adapter(0)
 peripherals = Peripheral[]
 set_callback_on_scan_found(adapter) do peri
-	println("Found device: ", identifier(peri), "[",address(peri),"]")
-	if is_connectable(peri)
-		push!(peripherals, peri)
-	end
+	println("Found device: ", identifier(peri), " [",address(peri),"]")
+	is_connectable(peri) && push!(peripherals, peri)
 end
 set_callback_on_scan_start(()->println("Scan started"), adapter)
 set_callback_on_scan_stop(()->println("Scan stopped"), adapter)
@@ -69,9 +65,9 @@ for (i,p) in enumerate(peripherals)
 	println("[$i] ", identifier(p), " [$(address(p))]")
 end
 
-print("Please select a device to connect to")
+print("Please select a device to connect to: ")
 selection = parse(Int, readline())
-selection in eachindex(peripherals) || exit(1)
+selection in eachindex(peripherals) || error("Incorrect selection")
 
 peri = peripherals[selection]
 println("Connecting to ", identifier(peri), " [",address(peri),"]")
@@ -81,8 +77,7 @@ connect(peri) do
 	uuids = Tuple{SBLEUUID, SBLEUUID}[]
 	for S in services(peri)
 		for C in S.characteristics
-			C.can_indicate || continue
-			push!(uuids, (S.uuid, C.uuid))
+			C.can_indicate && push!(uuids, (S.uuid, C.uuid))
 		end
 	end
 
@@ -134,10 +129,8 @@ end
 adapter = get_adapter(0)
 peripherals = Peripheral[]
 set_callback_on_scan_found(adapter) do peri
-	println("Found device: ", identifier(peri), "[",address(peri),"]")
-	if is_connectable(peri)
-		push!(peripherals, peri)
-	end
+	println("Found device: ", identifier(peri), " [",address(peri),"]")
+	is_connectable(peri) && push!(peripherals, peri)
 end
 set_callback_on_scan_start(()->println("Scan started"), adapter)
 set_callback_on_scan_stop(()->println("Scan stopped"), adapter)
@@ -148,9 +141,9 @@ for (i,p) in enumerate(peripherals)
 	println("[$i] ", identifier(p), " [$(address(p))]")
 end
 
-print("Please select a device to connect to")
+print("Please select a device to connect to: ")
 selection = parse(Int, readline())
-selection in eachindex(peripherals) || exit(1)
+selection in eachindex(peripherals) || error("Incorrect selection")
 
 peri = peripherals[selection]
 println("Connecting to ", identifier(peri), " [",address(peri),"]")
@@ -167,7 +160,6 @@ end
 ## Notify multi
 
 ```julia
-
 mutable struct AtomicBool
 	@atomic val::Bool
 end
@@ -177,9 +169,7 @@ adapter = get_adapter(0)
 peripherals = Peripheral[]
 set_callback_on_scan_found(adapter) do peri
 	println("Found device: ", identifier(peri), "[",address(peri),"]")
-	if is_connectable(peri)
-		push!(peripherals, peri)
-	end
+	is_connectable(peri) && push!(peripherals, peri)
 end
 set_callback_on_scan_start(()->println("Scan started"), adapter)
 set_callback_on_scan_stop(()->println("Scan stopped"), adapter)
@@ -195,9 +185,9 @@ for i in 1:2
 		println("[$i] ", identifier(p), " [$(address(p))]")
 	end
 
-	print("Please select a device to connect to")
+	print("Please select a device to connect to: ")
 	selection = parse(Int, readline())
-	selection in eachindex(peripherals) || exit(1)
+	selection in eachindex(peripherals) || error("Incorrect selection")
 
 	peri = peripherals[selection]
 	println("Connecting to ", identifier(peri), " [",address(peri),"]")
@@ -207,7 +197,6 @@ for i in 1:2
 	uuids = Tuple{SBLEUUID, SBLEUUID}[]
 	for S in services(peri)
 		for C in S.characteristics
-			C.can_indicate || continue
 			push!(uuids, (S.uuid, C.uuid))
 		end
 	end
@@ -275,9 +264,7 @@ adapter = get_adapter(0)
 peripherals = Peripheral[]
 set_callback_on_scan_found(adapter) do peri
 	println("Found device: ", identifier(peri), "[",address(peri),"]")
-	if is_connectable(peri)
-		push!(peripherals, peri)
-	end
+	is_connectable(peri) && push!(peripherals, peri)
 end
 set_callback_on_scan_start(()->println("Scan started"), adapter)
 set_callback_on_scan_stop(()->println("Scan stopped"), adapter)
@@ -288,9 +275,9 @@ for (i,p) in enumerate(peripherals)
 	println("[$i] ", identifier(p), " [$(address(p))]")
 end
 
-print("Please select a device to connect to")
+print("Please select a device to connect to: ")
 selection = parse(Int, readline())
-selection in eachindex(peripherals) || exit(1)
+selection in eachindex(peripherals) || error("Incorrect selection")
 
 peri = peripherals[selection]
 println("Connecting to ", identifier(peri), " [",address(peri),"]")
@@ -300,7 +287,6 @@ connect(peri) do
 	uuids = Tuple{SBLEUUID, SBLEUUID}[]
 	for S in services(peri)
 		for C in S.characteristics
-			C.can_indicate || continue
 			push!(uuids, (S.uuid, C.uuid))
 		end
 	end
@@ -329,11 +315,11 @@ adapter = get_adapter(0)
 peripherals = Peripheral[]
 set_callback_on_scan_found(adapter) do peri
 	println("Found device: ", identifier(peri), "[",address(peri),"]",
-	peripheral_rssi(peri), " dBm")
+	rssi(peri), " dBm")
 end
 set_callback_on_scan_updated(adapter) do peri
 	println("Updated device: ", identifier(peri), "[",address(peri),"]",
-	peripheral_rssi(peri), " dBm")
+	rssi(peri), " dBm")
 end
 set_callback_on_scan_start(()->println("Scan started"), adapter)
 set_callback_on_scan_stop(()->println("Scan stopped"), adapter)
@@ -369,9 +355,7 @@ adapter = get_adapter(0)
 peripherals = Peripheral[]
 set_callback_on_scan_found(adapter) do peri
 	println("Found device: ", identifier(peri), "[",address(peri),"]")
-	if is_connectable(peri)
-		push!(peripherals, peri)
-	end
+	is_connectable(peri) && push!(peripherals, peri)
 end
 set_callback_on_scan_start(()->println("Scan started"), adapter)
 set_callback_on_scan_stop(()->println("Scan stopped"), adapter)
@@ -382,9 +366,9 @@ for (i,p) in enumerate(peripherals)
 	println("[$i] ", identifier(p), " [$(address(p))]")
 end
 
-print("Please select a device to connect to")
+print("Please select a device to connect to: ")
 selection = parse(Int, readline())
-selection in eachindex(peripherals) || exit(1)
+selection in eachindex(peripherals) || error("Incorrect selection")
 
 peri = peripherals[selection]
 println("Connecting to ", identifier(peri), " [",address(peri),"]")
@@ -395,7 +379,6 @@ connect(peri) do
 	uuids = Tuple{SBLEUUID, SBLEUUID}[]
 	for S in services(peri)
 		for C in S.characteristics
-			C.can_indicate || continue
 			push!(uuids, (S.uuid, C.uuid))
 		end
 	end
