@@ -48,7 +48,7 @@ function Base.show(io::IO, x::SBLEDESCRIPTOR)
 end
 
 """
-Can be written to with write_request and write_command along with
+Can be written to with `write_request` and `write_command` along with
 it's associated `SBLESERVICE`
 
 You can check what Characteristics a peripheral has with `services`
