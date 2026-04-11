@@ -1,10 +1,8 @@
 # Peripherals
 
-```@docs ; canonical=false
-identifier
-address
-```
 ```@docs
+identifier(::Peripheral)
+address(::Peripheral)
 address_type
 rssi
 tx_power

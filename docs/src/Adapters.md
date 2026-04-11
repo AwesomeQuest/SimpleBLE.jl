@@ -5,8 +5,8 @@ is_bluetooth_enabled
 adapters_get_count
 get_adapter
 get_adapters
-identifier
-address
+identifier(::Adapter)
+address(::Adapter)
 power_on
 power_off
 is_powered

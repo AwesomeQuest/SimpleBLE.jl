@@ -31,7 +31,7 @@ import Base
 	identifier(peripheral)
 Get the name of a peripheral.
 
-See also [`address`](@ref)
+See also [`address(::Peripheral)`](@ref)
 """
 function identifier(peripheral::Peripheral)
 	cstr = ccall(
@@ -50,7 +50,7 @@ end
 	address(peripheral)
 Get the address of a peripheral.
 
-See also [`identifier`](@ref)
+See also [`identifier(::Peripheral)`](@ref)
 """
 function address(peripheral::Peripheral)
 	cstr = ccall(
@@ -284,14 +284,14 @@ end
 	write_request(peripheral,
 		service::Union{AbstractString, SBLEUUID, SBLESERVICE},
 		characteristic::Union{AbstractString, SBLEUUID, SBLECHARACTERISTIC},
-		data <: AbstractArray
+		data <: Union{AbstractString, AbstractArray}
 	)
 Write a request to a characteristic.
 
 See also [`write_command`](@ref)
 """
 function write_request(peripheral::Peripheral,
-	s::SBLEUUID, c::SBLEUUID, data::Union{A, S}) where {A <: AbstractArray, S <: AbstractString}
+	s::SBLEUUID, c::SBLEUUID, data)
 	if typeof(data) <: AbstractString
 		data = codeunits(data)
 	end
@@ -322,7 +322,7 @@ end
 		peripheral,
 		service::Union{AbstractString, SBLEUUID, SBLESERVICE},
 		characteristic::Union{AbstractString, SBLEUUID, SBLECHARACTERISTIC},
-		data <: AbstractArray
+		data <: Union{AbstractString, AbstractArray}
 	)
 Write a command to a characteristic.
 
@@ -555,7 +555,7 @@ end
 		service::Union{AbstractString, SBLEUUID, SBLESERVICE},
 		characteristic::Union{AbstractString, SBLEUUID, SBLECHARACTERISTIC},
 		descriptor::Union{AbstractString, SBLEUUID, SBLECHARACTERISTIC},
-		data <: AbstractArray
+		data <: Union{AbstractString, AbstractArray}
 	)
 Write data to a descriptor.
 """

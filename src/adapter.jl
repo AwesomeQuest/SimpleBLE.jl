@@ -69,7 +69,7 @@ end
 	identifier(adapter)
 Get the name of an `adapter`.
 
-See also [`address`](@ref)
+See also [`address(::Adapter)`](@ref)
 """
 function identifier(adapter::Adapter)
 	cstr = ccall(
@@ -88,7 +88,7 @@ end
 	address(adapter)
 Get the address of an `adapter`.
 
-See also [`identifier`](@ref)
+See also [`identifier(::Adapter)`](@ref)
 """
 function address(adapter::Adapter)
 	cstr = ccall(
