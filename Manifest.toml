@@ -307,7 +307,7 @@ version = "1.11.0"
 deps = ["SimpleBLE_jll"]
 path = "."
 uuid = "c43e3543-e659-46d0-a341-79c7b8740d4a"
-version = "0.3.2"
+version = "0.3.4"
 
 [[deps.SimpleBLE_jll]]
 deps = ["Artifacts", "Dbus_jll", "JLLWrappers", "Libdl"]
