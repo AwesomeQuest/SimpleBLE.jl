@@ -12,7 +12,7 @@ set_callback_on_scan_found(adapter) do peri
 end
 set_callback_on_scan_start(()->println("Scan started"), adapter)
 set_callback_on_scan_stop(()->println("Scan stopped"), adapter)
-scan_for(5000)
+scan_for(adapter, 5000)
 
 println("The following connectable devices were found")
 for (i,p) in enumerate(peripherals)
@@ -30,16 +30,16 @@ connect(peri) do
 	println("MTU: ", mtu(peri))
 	for S in services(peri)
 		println("Service: ", S.uuid)
-		for C in S.characteristics
+		for C in S.characteristics[1:S.characteristic_count]
 			println("\tCharacteristic: ", C.uuid)
-			print("\t\tCapabilities: ")
-			print(" can_read: $(C.can_read)")
-			print(" can_write_request: $(C.can_write_request)")
-			print(" can_write_command: $(C.can_write_command)")
-			print(" can_notify: $(C.can_notify)")
-			print(" can_indicate: $(C.can_indicate)")
+			print("\t\tCapabilities:")
+			println("\t\t\tcan_read: $(C.can_read)")
+			println("\t\t\tcan_write_request: $(C.can_write_request)")
+			println("\t\t\tcan_write_command: $(C.can_write_command)")
+			println("\t\t\tcan_notify: $(C.can_notify)")
+			println("\t\t\tcan_indicate: $(C.can_indicate)")
 			println()
-			for D in C.descriptors
+			for D in C.descriptors[1:C.descriptor_count]
 				println("\t\t\tDescriptor: ", D.uuid)
 			end
 		end
@@ -58,7 +58,7 @@ set_callback_on_scan_found(adapter) do peri
 end
 set_callback_on_scan_start(()->println("Scan started"), adapter)
 set_callback_on_scan_stop(()->println("Scan stopped"), adapter)
-scan_for(5000)
+scan_for(adapter, 5000)
 
 println("The following connectable devices were found")
 for (i,p) in enumerate(peripherals)
@@ -76,7 +76,7 @@ connect(peri) do
 
 	uuids = Tuple{SBLEUUID, SBLEUUID}[]
 	for S in services(peri)
-		for C in S.characteristics
+		for C in S.characteristics[1:S.characteristic_count]
 			C.can_indicate && push!(uuids, (S.uuid, C.uuid))
 		end
 	end
@@ -85,7 +85,7 @@ connect(peri) do
 		println("[$i] $S $C")
 	end
 
-	print("Please select a characteristic to indicate")
+	print("Please select a characteristic to indicate: ")
 	selection = parse(Int, readline())
 	selection in eachindex(uuids) || error("Incorrect selection")
 
@@ -101,7 +101,7 @@ end
 
 ## List adapters
 ```julia
-println("Using SimpleBLE version", SimpleBLE.simpleble_get_version())
+println("Using SimpleBLE version: ", SimpleBLE.simpleble_get_version())
 println("Bluetooth enabled: ", SimpleBLE.is_bluetooth_enabled())
 
 for A in get_adapters()
@@ -125,7 +125,6 @@ end
 ## Multiconnect
 
 ```julia
-
 adapter = get_adapter(0)
 peripherals = Peripheral[]
 set_callback_on_scan_found(adapter) do peri
@@ -134,7 +133,7 @@ set_callback_on_scan_found(adapter) do peri
 end
 set_callback_on_scan_start(()->println("Scan started"), adapter)
 set_callback_on_scan_stop(()->println("Scan stopped"), adapter)
-scan_for(5000)
+scan_for(adapter, 5000)
 
 println("The following connectable devices were found")
 for (i,p) in enumerate(peripherals)
@@ -149,10 +148,10 @@ peri = peripherals[selection]
 println("Connecting to ", identifier(peri), " [",address(peri),"]")
 
 for i in 1:5
-	!connect(peri) || error("Failed at $i to connect")
+	connect(peri) || error("Failed at $i to connect")
 	println("Successfully connected.")
 	sleep(2)
-	!disconnect(peri) || error("Failed at $i to disconnect")
+	disconnect(peri) || error("Failed at $i to disconnect")
 	println("Successfully disconnected.")
 end
 ```
@@ -178,7 +177,7 @@ connected_peris = Peripheral[]
 
 for i in 1:2
 	empty!(peripherals)
-	scan_for(5000)
+	scan_for(adapter, 5000)
 
 	println("The following connectable devices were found")
 	for (i,p) in enumerate(peripherals)
@@ -196,8 +195,8 @@ for i in 1:2
 
 	uuids = Tuple{SBLEUUID, SBLEUUID}[]
 	for S in services(peri)
-		for C in S.characteristics
-			push!(uuids, (S.uuid, C.uuid))
+		for C in S.characteristics[1:S.characteristic_count]
+			C.can_notify && push!(uuids, (S.uuid, C.uuid))
 		end
 	end
 
@@ -205,7 +204,7 @@ for i in 1:2
 		println("[$i] $S $C")
 	end
 
-	print("Please select a characteristic to indicate")
+	print("Please select a characteristic to indicate: ")
 	selection = parse(Int, readline())
 	selection in eachindex(uuids) || error("Incorrect selection")
 
@@ -268,7 +267,7 @@ set_callback_on_scan_found(adapter) do peri
 end
 set_callback_on_scan_start(()->println("Scan started"), adapter)
 set_callback_on_scan_stop(()->println("Scan stopped"), adapter)
-scan_for(5000)
+scan_for(adapter, 5000)
 
 println("The following connectable devices were found")
 for (i,p) in enumerate(peripherals)
@@ -286,8 +285,8 @@ connect(peri) do
 
 	uuids = Tuple{SBLEUUID, SBLEUUID}[]
 	for S in services(peri)
-		for C in S.characteristics
-			push!(uuids, (S.uuid, C.uuid))
+		for C in S.characteristics[1:S.characteristic_count]
+			C.can_read && push!(uuids, (S.uuid, C.uuid))
 		end
 	end
 
@@ -295,7 +294,7 @@ connect(peri) do
 		println("[$i] $S $C")
 	end
 
-	print("Please select a characteristic to read")
+	print("Please select a characteristic to read: ")
 	selection = parse(Int, readline())
 	selection in eachindex(uuids) || error("Incorrect selection")
 
@@ -323,7 +322,7 @@ set_callback_on_scan_updated(adapter) do peri
 end
 set_callback_on_scan_start(()->println("Scan started"), adapter)
 set_callback_on_scan_stop(()->println("Scan stopped"), adapter)
-scan_for(2000)
+scan_for(adapter, 2000)
 
 println("Scan complete.")
 
@@ -338,7 +337,7 @@ for P in scan_get_results(adapter)
 
 	for S in services(P)
 		println("\tService UUID: ", S.uuid)
-		println("\tService data: ", S.data)
+		println("\tService data: ", S.data[1:S.data_length])
 	end
 
 	for M in manufacturer_data(P)
@@ -359,7 +358,7 @@ set_callback_on_scan_found(adapter) do peri
 end
 set_callback_on_scan_start(()->println("Scan started"), adapter)
 set_callback_on_scan_stop(()->println("Scan stopped"), adapter)
-scan_for(5000)
+scan_for(adapter, 5000)
 
 println("The following connectable devices were found")
 for (i,p) in enumerate(peripherals)
@@ -378,8 +377,8 @@ connect(peri) do
 
 	uuids = Tuple{SBLEUUID, SBLEUUID}[]
 	for S in services(peri)
-		for C in S.characteristics
-			push!(uuids, (S.uuid, C.uuid))
+		for C in S.characteristics[1:S.characteristic_count]
+			C.can_write_request && push!(uuids, (S.uuid, C.uuid))
 		end
 	end
 
@@ -387,7 +386,7 @@ connect(peri) do
 		println("[$i] $S $C")
 	end
 
-	print("Please select a characteristic to write into")
+	print("Please select a characteristic to write into: ")
 	selection = parse(Int, readline())
 	selection in eachindex(uuids) || error("Incorrect selection")
 
