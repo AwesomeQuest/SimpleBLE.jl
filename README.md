@@ -16,9 +16,9 @@ Enter Pkg mode in Julia by typing ] in the REPL
 Bluetooth is a hierarchy
 - Bluetooth devices are called peripherals
   - Those peripherals have services 
-    - Services have charecteristics
+    - Services have characteristics
       - Characteristics can be read and written to
-      - Characteristics can also be either notifyed or indicated (assigned callbacks that recive data whenever it is sent)
+      - Characteristics can also be either notified or indicated (assigned callbacks that receive data whenever it is sent)
       - Characteristics have descriptors
         - Descriptors can be read and written to
 
