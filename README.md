@@ -23,7 +23,7 @@ Bluetooth is a hierarchy
         - Descriptors can be read and written to
 
 # Usage example
-The bellow example is actual code that I used for a project.
+The bellow example is actual code that I used for a project. See the docs (above) for more examples.
 ```julia
 # You generally need to know the UUIDs of things in advance
 # since they don't have names, but you can query a peripheral
