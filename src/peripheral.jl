@@ -532,7 +532,9 @@ function read_descriptor(peripheral::Peripheral,
 		@error "Failed to read peripheral"
 		return nothing
 	end
-	return unsafe_wrap(Vector{UInt8}, data_ptr[], data_length[])
+	return finalizer(unsafe_wrap(Vector{UInt8}, data_ptr[], data_length[])) do x
+		free(data_ptr[])
+	end
 end
 
 function write_descriptor(peripheral::Peripheral,
