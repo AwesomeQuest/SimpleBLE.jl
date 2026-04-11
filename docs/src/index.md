@@ -1,6 +1,6 @@
 # SimpleBLE.jl
 
-SimpleBLE is a cross-platform bluetooth low energy (BLE) library,
+[SimpleBLE](https://github.com/simpleble/simpleble.git) is a cross-platform bluetooth low energy (BLE) library,
 designed for simplicity and ease of use.
 
 ## Simple example
