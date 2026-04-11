@@ -1,10 +1,7 @@
-
-| **Documentation**   |
-|:-------------------:|
-| [![][docs-stable-img]][docs-stable-url] |
+[![][docs-stable-img]][docs-stable-url]
 
 # SimpleBLE.jl
-A Julia wrapper for interfacing with the [SimpleBLE](https://github.com/simpleble/simpleble.git) bluetooth C library.
+A Julia wrapper for interfacing with the [SimpleBLE](https://github.com/simpleble/simpleble.git) bluetooth C library, currently only works on Windows and Linux. If you have an Apple device and are willing to do some testing please open an issue.
 
 ## Installation
 Currently SimpleBLE.jl is not registered so you'll need to first install the binary wrapper [SimpleBLE_jll](https://github.com/AwesomeQuest/SimpleBLE_jll.git) and then this library
