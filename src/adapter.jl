@@ -58,6 +58,8 @@ end
 "Get a Vector of adapters"
 function get_adapters()
 	adapters = Adapter[]
+	count = adapters_get_count()
+	count == 0 && return adapters
 	for i in 0:adapters_get_count()-1
 		A = get_adapter(i)
 		push!(adapters, A)
@@ -283,6 +285,7 @@ function scan_get_results(adapter::Adapter)
 		(SBLEADAPTER, ),
 		adapter
 	)
+	count == 0 && return peris
 	for i in 0:count-1
 		c_p = ccall(
 			(:simpleble_adapter_scan_get_results_handle, simplecble),
@@ -305,6 +308,8 @@ function get_paired_peripherals(adapter::Adapter)
 		(SBLEADAPTER, ),
 		adapter
 	)
+	# count is unsigned so count-1 == typemax(Csize_t) :)
+	count == 0 && return peris
 	for i in 0:count-1
 		c_p = ccall(
 			(:simpleble_adapter_get_paired_peripherals_handle, simplecble),
@@ -330,6 +335,7 @@ function get_connected_peripherals(adapter::Adapter)
 		(SBLEADAPTER, ),
 		adapter
 	)
+	count == 0 && return peris
 	for i in 0:count-1
 		c_p = ccall(
 			(:simpleble_adapter_get_connected_peripherals_handle, simplecble),

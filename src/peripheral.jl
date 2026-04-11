@@ -182,13 +182,14 @@ const unpair(peripheral::Peripheral) = ccall(
 Acquire the services provided by a peripheral.
 """
 function services(peripheral::Peripheral)
+	services = SBLESERVICE[]
 	count = ccall(
 		(:simpleble_peripheral_services_count, simplecble),
 		Csize_t,
 		(SBLEPERIPHERAL, ),
 		peripheral
 	)
-	services = SBLESERVICE[]
+	count == 0 && return services
 	for i in 0:count-1
 		ret = Ref{SBLESERVICE}()
 		err = ccall(
@@ -215,6 +216,7 @@ function manufacturer_data(peripheral::Peripheral)
 		peripheral
 	)
 	manufacturer_data = SBLEMANUFACTURERDATA[]
+	count == 0 && return manufacturer_data
 	for i in 0:count-1
 		ret = Ref{SBLEMANUFACTURERDATA}()
 		err = ccall(
@@ -263,7 +265,7 @@ function peripheral_read(peripheral::Peripheral, s::SBLEUUID, c::SBLEUUID)
 		@error "Failed to read peripheral"
 		return nothing
 	end
-	return finalizer(unsafe_wrap(Vector{UInt8}, data_ptr[], data_length[])) do
+	return finalizer(unsafe_wrap(Vector{UInt8}, data_ptr[], data_length[])) do x
 		# @async @warn "Freeing data passed to peripheral_read $(data_ptr[])"
 		free(data_ptr[])
 	end
@@ -490,7 +492,7 @@ function unsubscribe(peripheral::Peripheral, s::SBLEUUID, c::SBLEUUID)
 		peripheral, s, c
 	)
 	if err == SBLEFAILURE
-		@error "Failed to subscribe to notification"
+		@error "Failed to unsubscribe to notification"
 		return nothing
 	end
 	delete!(peripheral.subscriptions, (s,c))
