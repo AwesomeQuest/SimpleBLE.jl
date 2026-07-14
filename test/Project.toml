@@ -1,6 +1,3 @@
 [deps]
 SimpleBLE = "c43e3543-e659-46d0-a341-79c7b8740d4a"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-
-[sources]
-SimpleBLE = {path = ".."}

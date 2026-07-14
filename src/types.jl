@@ -36,7 +36,7 @@ function Base.show(io::IO, x::SBLEUUID)
 	if x == NULL_UUID
 		print(io, "00000000-0000-0000-0000-00000000000")
 	else
-		print(io, (String∘Vector{UInt8}∘collect)(x.value))
+		print(io, (String∘Vector{UInt8}∘collect)(x.value[1:end-1]))
 	end
 end
 

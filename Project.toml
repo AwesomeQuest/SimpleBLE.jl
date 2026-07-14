@@ -3,11 +3,11 @@ uuid = "c43e3543-e659-46d0-a341-79c7b8740d4a"
 version = "0.3.4"
 authors = ["Awesome Quest <torfit@gmail.com>"]
 
+[workspace]
+projects = ["docs", "test"]
+
 [deps]
 SimpleBLE_jll = "65d2f289-9923-54e7-9bd2-c5e9669d2a86"
 
 [compat]
 SimpleBLE_jll = "0.12.1"
-
-[workspace]
-projects = ["docs", "test"]

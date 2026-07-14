@@ -31,36 +31,39 @@ function find_peripheral(matchfunc, adapter)
 
 	scan_start(adapter)
 	@info "Waiting for peripheral"
-	peri = take!(perich)
-	scan_stop(adapter)
-	sleep(1)
-	close(perich)
-
-	# Clean up
-	ccall(
-		(:simpleble_adapter_set_callback_on_scan_start, simplecble),
-		SBLEERROR,
-		(SBLEADAPTER, Ptr{Cvoid}),
-		adapter, C_NULL
-	)
-	ccall(
-		(:simpleble_adapter_set_callback_on_scan_stop, simplecble),
-		SBLEERROR,
-		(SBLEADAPTER, Ptr{Cvoid}),
-		adapter, C_NULL
-	)
-	ccall(
-		(:simpleble_adapter_set_callback_on_scan_found, simplecble),
-		SBLEERROR,
-		(SBLEADAPTER, Ptr{Cvoid}),
-		adapter, C_NULL
-	)
-	ccall(
-		(:simpleble_adapter_set_callback_on_scan_updated, simplecble),
-		SBLEERROR,
-		(SBLEADAPTER, Ptr{Cvoid}),
-		adapter, C_NULL
-	)
+	peri = nothing
+	try
+		peri = take!(perich)
+	finally
+		scan_stop(adapter)
+		sleep(1)
+		close(perich)
+		# Clean up
+		ccall(
+			(:simpleble_adapter_set_callback_on_scan_start, simplecble),
+			SBLEERROR,
+			(SBLEADAPTER, Ptr{Cvoid}),
+			adapter, C_NULL
+		)
+		ccall(
+			(:simpleble_adapter_set_callback_on_scan_stop, simplecble),
+			SBLEERROR,
+			(SBLEADAPTER, Ptr{Cvoid}),
+			adapter, C_NULL
+		)
+		ccall(
+			(:simpleble_adapter_set_callback_on_scan_found, simplecble),
+			SBLEERROR,
+			(SBLEADAPTER, Ptr{Cvoid}),
+			adapter, C_NULL
+		)
+		ccall(
+			(:simpleble_adapter_set_callback_on_scan_updated, simplecble),
+			SBLEERROR,
+			(SBLEADAPTER, Ptr{Cvoid}),
+			adapter, C_NULL
+		)
+	end
 
 	return peri
 end
