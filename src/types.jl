@@ -129,7 +129,7 @@ mutable struct Adapter
 	ptr::SBLEADAPTER
 	function Adapter(x)
 		return finalizer(new(x)) do y
-			# @async @warn "$(time_ns()): Finalizing Adapter $(y.ptr)"
+			@debug "$(time_ns()): Finalizing Adapter $(y.ptr)"
 			y.ptr == C_NULL && return nothing
 			ccall(
 				(:simpleble_adapter_release_handle, simplecble),
@@ -140,7 +140,7 @@ mutable struct Adapter
 		end
 	end
 end
-Base.cconvert(::Type{SBLEADAPTER}, x::Adapter) = x.ptr
+Base.unsafe_convert(::Type{SBLEADAPTER}, x::Adapter) = x.ptr
 
 # Only ever create a peripheral when you know you need to release it
 """
@@ -153,7 +153,7 @@ mutable struct Peripheral
 	subscriptions::Set{Tuple{SBLEUUID,SBLEUUID}}
 	function Peripheral(x)
 		return finalizer(new(x, Set{Tuple{SBLEUUID,SBLEUUID}}())) do y
-			# @async @warn "$(time_ns()): Finalizing Peripheral $(y.ptr)"
+			@debug "$(time_ns()): Finalizing Peripheral $(y.ptr)"
 			ccall(
 				(:simpleble_peripheral_set_callback_on_connected, simplecble),
 				SBLEERROR,
@@ -185,4 +185,4 @@ mutable struct Peripheral
 		end
 	end
 end
-Base.cconvert(::Type{SBLEPERIPHERAL}, x::Peripheral) = x.ptr
+Base.unsafe_convert(::Type{SBLEPERIPHERAL}, x::Peripheral) = x.ptr

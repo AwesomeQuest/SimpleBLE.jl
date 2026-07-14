@@ -25,7 +25,7 @@ export identifier,
 
 import Base
 
-### The following are public function intended for users
+### The following are public functions intended for users
 
 """
 	identifier(peripheral)
@@ -41,7 +41,7 @@ function identifier(peripheral::Peripheral)
 		peripheral
 	)
 	return finalizer(unsafe_string(cstr)) do x
-		# @async @warn "$(time_ns()): Freeing string with value $x"
+		@debug "$(time_ns()): Freeing string with value $x"
 		free(pointer(cstr))
 	end
 end
@@ -60,7 +60,7 @@ function address(peripheral::Peripheral)
 		peripheral
 	)
 	return finalizer(unsafe_string(cstr)) do x
-		# @async @warn "$(time_ns()): Freeing string with value $x"
+		@debug "$(time_ns()): Freeing string with value $x"
 		free(pointer(cstr))
 	end
 end
@@ -76,7 +76,7 @@ const address_type(peripheral::Peripheral) = ccall(
 "`rssi(peripheral)`"
 const rssi(peripheral::Peripheral) = ccall(
 	(:simpleble_peripheral_rssi, simplecble),
-	UInt16,
+	Int16,
 	(SBLEPERIPHERAL, ),
 	peripheral
 )
@@ -145,7 +145,7 @@ function is_connectable(peripheral::Peripheral)
 	err = ccall(
 		(:simpleble_peripheral_is_connectable, simplecble),
 		SBLEERROR,
-		(SBLEADAPTER, Ptr{Bool}),
+		(SBLEPERIPHERAL, Ptr{Bool}),
 		peripheral, ret
 	)
 	if err == SBLEFAILURE
@@ -161,7 +161,7 @@ function is_paired(peripheral::Peripheral)
 	err = ccall(
 		(:simpleble_peripheral_is_paired, simplecble),
 		SBLEERROR,
-		(SBLEADAPTER, Ptr{Bool}),
+		(SBLEPERIPHERAL, Ptr{Bool}),
 		peripheral, ret
 	)
 	if err == SBLEFAILURE
@@ -266,7 +266,7 @@ function peripheral_read(peripheral::Peripheral, s::SBLEUUID, c::SBLEUUID)
 		return nothing
 	end
 	return finalizer(unsafe_wrap(Vector{UInt8}, data_ptr[], data_length[])) do x
-		# @async @warn "Freeing data passed to peripheral_read $(data_ptr[])"
+		@debug "Freeing data passed to peripheral_read $(data_ptr[])"
 		free(data_ptr[])
 	end
 end

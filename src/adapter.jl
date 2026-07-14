@@ -22,7 +22,7 @@ export is_bluetooth_enabled,
 	set_callback_on_scan_updated
 
 
-### The following are public function intended for users
+### The following are public functions intended for users
 
 "Check if system bluetooth is enabled"
 const is_bluetooth_enabled() = ccall(
@@ -81,7 +81,7 @@ function identifier(adapter::Adapter)
 		adapter
 	)
 	return finalizer(unsafe_string(cstr)) do x
-		# @async @warn "$(time_ns()): Freeing string with value $x"
+		@debug "$(time_ns()): Freeing string with value $x"
 		free(pointer(cstr))
 	end
 end
@@ -100,7 +100,7 @@ function address(adapter::Adapter)
 		adapter
 	)
 	return finalizer(unsafe_string(cstr)) do x
-		# @async @warn "$(time_ns()): Freeing string with value $x"
+		@debug "$(time_ns()): Freeing string with value $x"
 		free(pointer(cstr))
 	end
 end
@@ -123,7 +123,7 @@ end
 
 """
 	power_off(adapter)
-Power on an `adapter`
+Power off an `adapter`
 
 See also [`power_on`](@ref), [`is_powered`](@ref)
 """
@@ -447,8 +447,8 @@ function set_callback_on_scan_updated(callback, adapter::Adapter)
 	err = ccall(
 		(:simpleble_adapter_set_callback_on_scan_updated, simplecble),
 		SBLEERROR,
-		(SBLEADAPTER, Ptr{Cvoid}),
-		adapter, c_callback
+		(SBLEADAPTER, Ptr{Cvoid}, Ptr{Cvoid}),
+		adapter, c_callback, C_NULL
 	)
 	err != SBLESUCCESS && @error "Assigning callback failed"
 	return nothing
