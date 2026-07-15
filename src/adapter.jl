@@ -80,6 +80,7 @@ function identifier(adapter::Adapter)
 		(SBLEADAPTER, ),
 		adapter
 	)
+	cstr == C_NULL && return ""
 	return finalizer(unsafe_string(cstr)) do x
 		@debug "$(time_ns()): Freeing string with value $x"
 		free(pointer(cstr))
@@ -99,6 +100,7 @@ function address(adapter::Adapter)
 		(SBLEADAPTER, ),
 		adapter
 	)
+	cstr == C_NULL && return ""
 	return finalizer(unsafe_string(cstr)) do x
 		@debug "$(time_ns()): Freeing string with value $x"
 		free(pointer(cstr))

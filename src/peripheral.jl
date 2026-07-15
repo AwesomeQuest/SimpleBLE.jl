@@ -40,6 +40,7 @@ function identifier(peripheral::Peripheral)
 		(SBLEPERIPHERAL, ),
 		peripheral
 	)
+	cstr == C_NULL && return ""
 	return finalizer(unsafe_string(cstr)) do x
 		@debug "$(time_ns()): Freeing string with value $x"
 		free(pointer(cstr))
@@ -59,6 +60,7 @@ function address(peripheral::Peripheral)
 		(SBLEPERIPHERAL, ),
 		peripheral
 	)
+	cstr == C_NULL && return ""
 	return finalizer(unsafe_string(cstr)) do x
 		@debug "$(time_ns()): Freeing string with value $x"
 		free(pointer(cstr))
