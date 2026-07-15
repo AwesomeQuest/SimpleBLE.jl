@@ -85,7 +85,7 @@ atexit() do
 			err == SBLEFAILURE && @error "Failed to stop scan"
 		end
 	end
-	Libc.dlclose(simplecble)
+	Libdl.dlclose(simplecble)
 end
 
 
