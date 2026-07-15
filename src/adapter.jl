@@ -82,7 +82,7 @@ function identifier(adapter::Adapter)
 	)
 	cstr == C_NULL && return ""
 	return finalizer(unsafe_string(cstr)) do x
-		@debug "$(time_ns()): Freeing string with value $x"
+		# @debug "$(time_ns()): Freeing string with value $x"
 		free(pointer(cstr))
 	end
 end
@@ -102,7 +102,7 @@ function address(adapter::Adapter)
 	)
 	cstr == C_NULL && return ""
 	return finalizer(unsafe_string(cstr)) do x
-		@debug "$(time_ns()): Freeing string with value $x"
+		# @debug "$(time_ns()): Freeing string with value $x"
 		free(pointer(cstr))
 	end
 end

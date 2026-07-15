@@ -40,7 +40,7 @@ end
 
 global adapters = Adapter[]
 atexit() do
-	@debug "Cleaning up SimpleBLE"
+	# @debug "Cleaning up SimpleBLE"
 	for a in adapters
 		ccall(
 			(:simpleble_adapter_set_callback_on_scan_start, simplecble),
