@@ -137,6 +137,7 @@ mutable struct Adapter
 				(SBLEADAPTER, ),
 				y.ptr
 			)
+			@debug "$(time_ns()): Finished finalizing Adapter $(y.ptr)"
 		end
 	end
 end
