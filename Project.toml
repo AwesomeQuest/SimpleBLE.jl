@@ -7,9 +7,7 @@ authors = ["Awesome Quest <torfit@gmail.com>"]
 projects = ["docs", "test"]
 
 [deps]
-Libdl = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 SimpleBLE_jll = "65d2f289-9923-54e7-9bd2-c5e9669d2a86"
 
 [compat]
-Libdl = "1.11.0"
 SimpleBLE_jll = "0.12.1"

@@ -1,7 +1,7 @@
 module SimpleBLE
 
 using SimpleBLE_jll
-import Libdl
+# import Libdl
 
 active_callbacks = Base.CFunction[]
 
