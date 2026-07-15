@@ -26,7 +26,18 @@ simpleble_logging_set_level(level) = ccall((:simpleble_logging_set_level, simple
 	end
 """
 function simpleble_logging_set_callback(callback)
-	c_callback = @cfunction($callback, Cvoid, (SBLELOGLEVEL, Cstring, Cstring, UInt32, Cstring, Cstring))
-	push!(active_callbacks, c_callback)
-	ccall((:simpleble_logging_set_callback, simplecble), Cvoid, (Ptr{Cvoid}, ), c_callback)
+    function wrapper(level, mod, file, line, func, msg)
+        callback(
+            level,
+            unsafe_string(mod),
+            unsafe_string(file),
+            line,
+            unsafe_string(func),
+            unsafe_string(msg),
+        )
+        return nothing
+    end
+    c_callback = @cfunction($wrapper, Cvoid, (SBLELOGLEVEL, Cstring, Cstring, UInt32, Cstring, Cstring))
+    push!(active_callbacks, c_callback)
+    ccall((:simpleble_logging_set_callback, simplecble), Cvoid, (Ptr{Cvoid},), c_callback)
 end
