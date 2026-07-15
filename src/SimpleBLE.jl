@@ -1,7 +1,7 @@
 module SimpleBLE
 
 using SimpleBLE_jll
-# import Libdl
+import Libdl
 
 active_callbacks = Base.CFunction[]
 
@@ -85,8 +85,8 @@ atexit() do
 			err == SBLEFAILURE && @error "Failed to stop scan"
 		end
 	end
-	# h = Libdl.dlopen(SimpleBLE_jll.simplecble, Libdl.RTLD_NOLOAD)  # existing handle
-	# Libdl.dlclose(h)
+	h = Libdl.dlopen(SimpleBLE_jll.simplecble, Libdl.RTLD_NOLOAD)  # existing handle
+	Libdl.dlclose(h)
 end
 
 
