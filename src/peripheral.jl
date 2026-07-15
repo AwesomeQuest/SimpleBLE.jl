@@ -84,7 +84,7 @@ const rssi(peripheral::Peripheral) = ccall(
 "`tx_power(peripheral)`"
 const tx_power(peripheral::Peripheral) = ccall(
 	(:simpleble_peripheral_tx_power, simplecble),
-	UInt16,
+	Int16,
 	(SBLEPERIPHERAL, ),
 	peripheral
 )
@@ -149,7 +149,7 @@ function is_connectable(peripheral::Peripheral)
 		peripheral, ret
 	)
 	if err == SBLEFAILURE
-		@error "Failed to check scan active"
+		@error "Failed to check if peripheral is connectable"
 		return nothing
 	end
 	return ret[]
@@ -165,7 +165,7 @@ function is_paired(peripheral::Peripheral)
 		peripheral, ret
 	)
 	if err == SBLEFAILURE
-		@error "Failed to check scan active"
+		@error "Failed to check if peripheral is paired"
 		return nothing
 	end
 	return ret[]
@@ -516,7 +516,7 @@ end
 		peripheral,
 		service::Union{AbstractString, SBLEUUID, SBLESERVICE},
 		characteristic::Union{AbstractString, SBLEUUID, SBLECHARACTERISTIC},
-		descriptor::Union{AbstractString, SBLEUUID, SBLECHARACTERISTIC}
+		descriptor::Union{AbstractString, SBLEUUID, SBLEDESCRIPTOR}
 	)
 Read data from a descriptor.
 """
