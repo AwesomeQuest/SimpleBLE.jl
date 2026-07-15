@@ -85,7 +85,8 @@ atexit() do
 			err == SBLEFAILURE && @error "Failed to stop scan"
 		end
 	end
-	Libdl.dlclose(simplecble)
+	h = Libdl.dlopen(SimpleBLE_jll.simplecble, Libdl.RTLD_NOLOAD)  # existing handle
+	Libdl.dlclose(h)
 end
 
 
