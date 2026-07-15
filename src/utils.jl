@@ -87,3 +87,52 @@ function connect(func, peripheral::Peripheral)
 	end
 	return true
 end
+
+function _props(c::SBLECHARACTERISTIC)
+    props = String[]
+    c.can_read          && push!(props, "read")
+    c.can_write_request && push!(props, "write")
+    c.can_write_command && push!(props, "write_no_rsp")
+    c.can_notify        && push!(props, "notify")
+    c.can_indicate      && push!(props, "indicate")
+    isempty(props) && push!(props, "none")
+    return join(props, ", ")
+end
+
+function _hexdata(data::NTuple{27, UInt8}, len::Csize_t)
+    len == 0 && return ""
+    parts = string.(data[1:len]; base=16, pad=2)
+    return " [" * join(parts, " ") * "]"
+end
+
+
+"""
+    print_services([io=stdout,] services)
+    print_services([io=stdout,] peripheral)
+
+Pretty-print a device's service tree with indentation.
+If given a `Peripheral`, fetches services first.
+"""
+function print_services(io::IO, services::Vector{SBLESERVICE})
+    for (i, svc) in enumerate(services)
+        i > 1 && println(io)
+        sdata = _hexdata(svc.data, svc.data_length)
+        println(io, "Service: ", svc.uuid, sdata)
+        for k in 1:svc.characteristic_count
+            ch = svc.characteristics[k]
+            println(io, "  Characteristic: ", ch.uuid, " [", _props(ch), "]")
+            for j in 1:ch.descriptor_count
+                d = ch.descriptors[j]
+                println(io, "    Descriptor: ", d.uuid)
+            end
+        end
+    end
+end
+
+print_services(services::Vector{SBLESERVICE}) = print_services(stdout, services)
+
+function print_services(io::IO, p::Peripheral)
+    print_services(io, services(p))
+end
+
+print_services(p::Peripheral) = print_services(stdout, p)
