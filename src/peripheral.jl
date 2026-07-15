@@ -42,7 +42,7 @@ function identifier(peripheral::Peripheral)
 	)
 	cstr == C_NULL && return ""
 	return finalizer(unsafe_string(cstr)) do x
-		# @debug "$(time_ns()): Freeing string with value $x"
+		Base.println(stderr, "$(time_ns()): Freeing string with value $x")
 		free(pointer(cstr))
 	end
 end
@@ -62,7 +62,7 @@ function address(peripheral::Peripheral)
 	)
 	cstr == C_NULL && return ""
 	return finalizer(unsafe_string(cstr)) do x
-		# @debug "$(time_ns()): Freeing string with value $x"
+		Base.println(stderr, "$(time_ns()): Freeing string with value $x")
 		free(pointer(cstr))
 	end
 end
@@ -268,7 +268,7 @@ function peripheral_read(peripheral::Peripheral, s::SBLEUUID, c::SBLEUUID)
 		return nothing
 	end
 	return finalizer(unsafe_wrap(Vector{UInt8}, data_ptr[], data_length[])) do x
-		# @debug "Freeing data passed to peripheral_read $(data_ptr[])"
+		Base.println(stderr, "Freeing data passed to peripheral_read $(data_ptr[])")
 		free(data_ptr[])
 	end
 end

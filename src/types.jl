@@ -129,7 +129,7 @@ mutable struct Adapter
 	ptr::SBLEADAPTER
 	function Adapter(x)
 		return finalizer(new(x)) do y
-			# @debug "$(time_ns()): Finalizing Adapter $(y.ptr)"
+			Base.println(stderr, "$(time_ns()): Finalizing Adapter $(y.ptr)")
 			y.ptr == C_NULL && return nothing
 			ccall(
 				(:simpleble_adapter_release_handle, simplecble),
@@ -137,7 +137,7 @@ mutable struct Adapter
 				(SBLEADAPTER, ),
 				y.ptr
 			)
-			# @debug "$(time_ns()): Finished finalizing Adapter $(y.ptr)"
+			Base.println(stderr, "$(time_ns()): Finished finalizing Adapter $(y.ptr)")
 		end
 	end
 end
@@ -154,7 +154,7 @@ mutable struct Peripheral
 	subscriptions::Set{Tuple{SBLEUUID,SBLEUUID}}
 	function Peripheral(x)
 		return finalizer(new(x, Set{Tuple{SBLEUUID,SBLEUUID}}())) do y
-			# @debug "$(time_ns()): Finalizing Peripheral $(y.ptr)"
+			Base.println(stderr, "$(time_ns()): Finalizing Peripheral $(y.ptr)")
 			ccall(
 				(:simpleble_peripheral_set_callback_on_connected, simplecble),
 				SBLEERROR,
